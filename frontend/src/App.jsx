@@ -1,10 +1,11 @@
 import './App.css'
+import PersistentDrawerLeft from './components/layaout/NavBar'
 
 function App() {
 
   return (
     <>
-      <h1>App</h1>
+      <PersistentDrawerLeft />
     </>
   )
 }
