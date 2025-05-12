@@ -1,12 +1,19 @@
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
 
-function App() {
+const Dummy = ({ title }) => <div className="p-8 text-white text-2xl">{title}</div>;
 
+export default function App() {
   return (
-    <>
-      <h1>App</h1>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          {/* These routes could also be dynamically generated via map() */}
+          <Route index element={<Dummy title="Inicio" />} />
+          <Route path="calendar" element={<Dummy title="Calendario" />} />
+          <Route path=":classId" element={<Dummy title="Clase" />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
 }
-
-export default App
