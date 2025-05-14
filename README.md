@@ -16,6 +16,7 @@ Dentro de cada carpeta, ejecutar los siguientes comandos:
 ```bash
 cd frontend
 npm install
+npm install lucide-react, react-router-dom
 ```
 
 ### Backend (con entorno virtual activado)
