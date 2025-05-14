@@ -35,6 +35,9 @@ import { getSidebarData } from "../api/sidebar";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { SideBarContext } from "../context/SideBarContext";
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import AddToDriveOutlinedIcon from '@mui/icons-material/AddToDriveOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 
 
@@ -247,12 +250,18 @@ export default function Sidebar() {
       {/* Contenido principal */}
       <Main open={open}>
         <DrawerHeader />
-        <Tabs onChange={handleTabChanged} value={currentTab}>
-          <Tab label="Novedades" />
-          <Tab label="Trabajo en clase" />
-          <Tab label="Personas" />
-        </Tabs>
-        {/* Aquí van tus otros componentes */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
+          <Tabs onChange={handleTabChanged} value={currentTab}>
+            <Tab label="Novedades" />
+            <Tab label="Trabajo en clase" />
+            <Tab label="Personas" />
+          </Tabs>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
+            <CalendarTodayOutlinedIcon fontSize="small" />
+            <AddToDriveOutlinedIcon fontSize="small" />
+            <SettingsOutlinedIcon fontSize="small" />
+          </Box>
+        </Box>
       </Main>
     </Box>
   );
