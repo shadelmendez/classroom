@@ -32,7 +32,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import SchoolIcon from '@mui/icons-material/School';
 import logo from "../assets/logo.svg"
 import { getSidebarData } from "../api/sidebar";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { SideBarContext } from "../context/SideBarContext";
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
@@ -103,8 +103,9 @@ const iconMap = {
 
 export default function Sidebar() {
   const theme = useTheme();
-  // const [open, setOpen] = useState(false);
-  const { open, setOpen } = useContext(SideBarContext);
+
+  const { open, setOpen, setClassId, classId } = useContext(SideBarContext)
+
   const [sections, setSections] = useState([]);
 
   useEffect(() => {
@@ -120,7 +121,6 @@ export default function Sidebar() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { classId } = useParams();
 
   const tabRoutes = [`overview`, `work`, `people`];
   const currentTab = tabRoutes.findIndex((route) =>
@@ -223,7 +223,7 @@ export default function Sidebar() {
             <List>
               {section.items.map((item, idx) => (
                 <ListItem key={idx} disablePadding>
-                  <ListItemButton component={RouterLink} to={`/class/${item.to.replace("/", "")}/overview`}>
+                  <ListItemButton onClick={() => setClassId(item.to.replace("/", ""))} component={RouterLink} to={`/class/${item.to.replace("/", "")}/overview`}>
                     <ListItemIcon sx={{ color: item.iconColor || theme.palette.custom.icons }}>
                       {<Avatar sx={{ width: 28, height: 28, backgroundColor: item.iconColor }}>{item.label[0]}</Avatar>}
                     </ListItemIcon>

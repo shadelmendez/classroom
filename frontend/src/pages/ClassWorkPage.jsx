@@ -1,18 +1,16 @@
 import MenuPopupState from '../components/MenuPopupState'
 import { Box } from '@mui/material'
 import * as React from 'react';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Theme from '../components/Theme';
 
 export default function ClassWorkPage() {
-    const [age, setAge] = React.useState('');
+    const [themes, setThemes] = React.useState('');
 
     const handleChange = (event) => {
-        setAge(event.target.value);
+        setThemes(event.target.value);
     };
     return (
         <Box>
@@ -20,7 +18,7 @@ export default function ClassWorkPage() {
             <Box sx={{ marginY: 2, width: "40%", }}>
                 <FormControl sx={{ width: "100%", }}>
                     <Select
-                        value={age}
+                        value={themes}
                         onChange={handleChange}
                         displayEmpty
                         inputProps={{ 'aria-label': 'Without label' }}
