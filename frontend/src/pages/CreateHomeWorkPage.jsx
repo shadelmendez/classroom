@@ -1,54 +1,110 @@
 import {
     Box,
     TextField,
-    Typography,
     Button,
     FormControl,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+    useTheme,
     Select,
-    MenuItem, useTheme
+    MenuItem
 } from '@mui/material';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
 import { useState, useContext } from 'react';
 import { SideBarContext } from '../context/SideBarContext';
-import SimpleDialogDemo from '../components/SimpleDialogDemo';
+import SideBarClassWork from '../components/SideBarClassWork';
 
 export default function CreateHomeWorkPage() {
-    const { classId } = useContext(SideBarContext)
-    const [title, setTitle] = useState("");
-    const [instructions, setInstructions] = useState("");
-    const [points, setPoints] = useState(0);
-    const [dueDate, setDueDate] = useState(null);
-    const [themes, setThemes] = useState("");
+    const {
+        title, setTitle,
+        instructions, setInstructions,
+        selectedTheme, setSelectedTheme,
+        isQuestion,
+        themesData, setThemesData
+    } = useContext(SideBarContext);
 
-    const theme = useTheme()
+    const theme = useTheme();
+
+    const [options, setOptions] = useState([
+        { text: '', id: 'a' },
+        { text: '', id: 'b' },
+        { text: '', id: 'c' },
+    ]);
+    const [selectedOption, setSelectedOption] = useState('');
+
+    const handleOptionChange = (e) => {
+        setSelectedOption(e.target.value);
+    };
+
+    const handleOptionTextChange = (index, newText) => {
+        const updated = [...options];
+        updated[index].text = newText;
+        setOptions(updated);
+    };
+
     const handleSubmit = (e) => {
-        e.preventDefault(); // evita recarga de la página
+        e.preventDefault();
 
-        // Aquí puedes manejar la lógica de envío, por ejemplo:
-        console.log({
+        const newTask = {
             title,
             instructions,
-            points,
-            dueDate: dueDate?.toISOString(), // si usas dayjs
-            themes
-        });
+            type: isQuestion ? 'question' : 'task',
+            date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }),
+            options: isQuestion ? options : [],
+            correctAnswer: isQuestion ? selectedOption : null
+        };
 
-        // Podrías también hacer un fetch/axios para enviar la tarea
+        // Asignar al tema correspondiente
+        const updatedThemes = themesData.map(t =>
+            t.title === selectedTheme
+                ? { ...t, tasks: [...t.tasks, newTask] }
+                : t
+        );
+        setThemesData(updatedThemes);
+
+        // Reset
+        setTitle('');
+        setInstructions('');
+        setOptions([
+            { text: '', id: 'a' },
+            { text: '', id: 'b' },
+            { text: '', id: 'c' },
+        ]);
+        setSelectedOption('');
+        setSelectedTheme('');
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', justifyContent: "space-between", gap: 5, width: "100%", backgroundColor: " rgb(248, 249, 250)" }}>
-            <Box sx={{ width: "60%", height: "100%", borderRadius: 3, border: 1, borderColor: "#dadce0", padding: 4, backgroundColor: theme.palette.background.default }}>
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+                display: 'flex',
+                justifyContent: "space-between",
+                gap: 5,
+                width: "100%",
+                backgroundColor: "rgb(248, 249, 250)"
+            }}
+        >
+            <Box
+                sx={{
+                    width: "60%",
+                    borderRadius: 3,
+                    border: 1,
+                    borderColor: "#dadce0",
+                    padding: 4,
+                    backgroundColor: theme.palette.background.default
+                }}
+            >
                 <TextField
-                    label="Tarea"
+                    label={isQuestion ? "Pregunta" : "Tarea"}
                     variant="filled"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     fullWidth
                 />
+
                 <TextField
                     label="Instrucciones (opcional)"
                     multiline
@@ -59,58 +115,58 @@ export default function CreateHomeWorkPage() {
                     fullWidth
                     sx={{ mt: 2 }}
                 />
-            </Box>
 
-            <Box sx={{ width: "40%", border: 1, borderColor: "#dadce0", padding: 4, backgroundColor: theme.palette.background.default }}>
-                <Typography sx={{ fontWeight: 500, color: "#5f6368", mb: 0.5 }}>
-                    Para
-                </Typography>
-                <FormControl fullWidth sx={{ mb: 4 }}>
+                <FormControl fullWidth sx={{ mt: 2 }}>
                     <Select
-                        value={classId}
-                        disabled
+                        value={selectedTheme}
+                        onChange={(e) => setSelectedTheme(e.target.value)}
                         displayEmpty
                     >
-                        <MenuItem value={classId}>{classId}</MenuItem>
+                        <MenuItem value="">
+                            <em>Selecciona un tema</em>
+                        </MenuItem>
+                        {themesData.map((t, idx) => (
+                            <MenuItem key={idx} value={t.title}>
+                                {t.title}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
 
-                <FormControl fullWidth sx={{ mb: 4 }}>
-                    <Typography>Asignar a</Typography>
-                    {/* <Button variant="outlined" startIcon={<PersonAddAlt1Icon />}>
-                        Todos los estudiantes</Button> */}
-                    <SimpleDialogDemo />
-                </FormControl>
-
-                <FormControl fullWidth sx={{ mb: 4 }}>
-                    <Typography>Fecha límite</Typography>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                            <DatePicker
-                                label="Seleccionar fecha"
-                                value={dueDate}
-                                onChange={(newValue) => setDueDate(newValue)}
-                            />
-                        </DemoContainer>
-                    </LocalizationProvider>
-                </FormControl>
-
-                <FormControl fullWidth sx={{ mb: 4 }}>
-                    <Typography>Tema</Typography>
-                    <Select
-                        value={theme}
-                        onChange={(e) => setThemes(e.target.value)}
-                        displayEmpty
-                    >
-                        <MenuItem value=""><em>Todos los temas</em></MenuItem>
-                        <MenuItem value="tema1">Tema 1</MenuItem>
-                        <MenuItem value="tema2">Tema 2</MenuItem>
-                        <MenuItem value="tema3">Tema 3</MenuItem>
-                    </Select>
-                </FormControl>
-
-                <Button type="submit" variant="contained">Asignar</Button>
+                {isQuestion && (
+                    <FormControl sx={{ mt: 2, width: "100%" }}>
+                        {options.map((option, index) => (
+                            <RadioGroup
+                                key={option.id}
+                                value={selectedOption}
+                                onChange={handleOptionChange}
+                                name="question-options"
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    mb: 2
+                                }}
+                            >
+                                <FormControlLabel
+                                    value={option.id}
+                                    control={<Radio />}
+                                    label=""
+                                />
+                                <TextField
+                                    label={`Respuesta ${index + 1}`}
+                                    variant="filled"
+                                    value={option.text}
+                                    onChange={(e) => handleOptionTextChange(index, e.target.value)}
+                                    sx={{ width: "90%" }}
+                                />
+                            </RadioGroup>
+                        ))}
+                    </FormControl>
+                )}
             </Box>
+
+            <SideBarClassWork />
         </Box>
     );
 }

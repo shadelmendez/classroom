@@ -1,38 +1,15 @@
-import MenuPopupState from '../components/MenuPopupState'
-import { Box } from '@mui/material'
-import * as React from 'react';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import Theme from '../components/Theme';
+import { Box } from '@mui/material';
+import MenuPopupState from '../components/MenuPopupState';
+import ThemeList from '../components/ThemeList';
+import TaskDetailsDialog from '../components/TaskDetailsDialog';
+
 
 export default function ClassWorkPage() {
-    const [themes, setThemes] = React.useState('');
-
-    const handleChange = (event) => {
-        setThemes(event.target.value);
-    };
     return (
-        <Box>
+        <Box sx={{ p: 2 }}>
             <MenuPopupState />
-            <Box sx={{ marginY: 2, width: "40%", }}>
-                <FormControl sx={{ width: "100%", }}>
-                    <Select
-                        value={themes}
-                        onChange={handleChange}
-                        displayEmpty
-                        inputProps={{ 'aria-label': 'Without label' }}
-                    >
-                        <MenuItem value="">
-                            <em>Todos los temas</em>
-                        </MenuItem>
-                        <MenuItem value={10}>Tema 1</MenuItem>
-                        <MenuItem value={20}>Tema 2</MenuItem>
-                        <MenuItem value={30}>Tema 3</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box>
-            <Theme />
+            <ThemeList />
+            <TaskDetailsDialog />
         </Box>
-    )
+    );
 }
