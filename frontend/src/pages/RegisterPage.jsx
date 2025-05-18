@@ -2,28 +2,37 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
-    Box, Button, TextField, Typography, Paper
+    Box, Button, TextField, Typography, Paper, Checkbox, FormControlLabel
 } from "@mui/material";
+import { registerUser } from "../api/api";
+
 
 export default function RegisterPage() {
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: "", password: "" });
+    const [error, setError] = useState("");
+    const [form, setForm] = useState({ email: "", password: "", is_student: false });
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value, type, checked } = e.target;
+        setForm({ ...form, [name]: type === "checkbox" ? checked : value });
     };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        register(form);
-        navigate("/");
+        try {
+            const res = await registerUser(form);
+            register(res.data); // opcional: guardar en contexto
+            navigate(`/class/${firstClassId}/overview`);
+        } catch (err) {
+            setError("Error al registrar usuario");
+        }
     };
 
     return (
         <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <Paper elevation={3} sx={{ padding: 4, width: 400 }}>
                 <Typography variant="h5" mb={2}>Crear cuenta</Typography>
+                {error && <Typography color="error">{error}</Typography>}
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Correo"
@@ -43,6 +52,17 @@ export default function RegisterPage() {
                         onChange={handleChange}
                         margin="normal"
                     />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={form.is_student}
+                                onChange={handleChange}
+                                name="is_student"
+                            />
+                        }
+                        label="¿Eres estudiante?"
+                    />
+
                     <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                         Registrarse
                     </Button>

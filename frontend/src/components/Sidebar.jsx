@@ -38,6 +38,7 @@ import { SideBarContext } from "../context/SideBarContext";
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import AddToDriveOutlinedIcon from '@mui/icons-material/AddToDriveOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import { AuthContext } from "../context/AuthContext";
 
 
 
@@ -107,6 +108,8 @@ export default function Sidebar() {
   const { open, setOpen, setClassId, classId } = useContext(SideBarContext)
 
   const [sections, setSections] = useState([]);
+  const { user } = useContext(AuthContext);
+
 
   useEffect(() => {
     const load = async () => {
@@ -122,10 +125,14 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const tabRoutes = [`overview`, `work`, `people`];
+  const baseTabs = [`overview`, `work`, `people`];
+  const tabRoutes = !user?.is_student ? [...baseTabs, `grades`] : baseTabs;
+
   const currentTab = tabRoutes.findIndex((route) =>
     location.pathname.includes(route)
   );
+  const tabValue = currentTab === -1 ? 0 : currentTab; // Valor válido siempre
+
 
   const handleTabChanged = (event, newValue) => {
     navigate(`/class/${classId}/${tabRoutes[newValue]}`);
@@ -251,11 +258,13 @@ export default function Sidebar() {
       <Main open={open}>
         <DrawerHeader />
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
-          <Tabs onChange={handleTabChanged} value={currentTab}>
+          <Tabs value={tabValue} onChange={handleTabChanged}>
             <Tab label="Novedades" />
             <Tab label="Trabajo en clase" />
             <Tab label="Personas" />
+            {!user?.is_student && <Tab label="Calificaciones" />}
           </Tabs>
+
           <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
             <CalendarTodayOutlinedIcon fontSize="small" />
             <AddToDriveOutlinedIcon fontSize="small" />

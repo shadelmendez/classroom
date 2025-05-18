@@ -2,28 +2,48 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
-    Box, Button, TextField, Typography, Paper
+    Box, Button, TextField, Typography, Paper, FormControlLabel, Checkbox
 } from "@mui/material";
+import { loginUser } from "../api/api";
+import { getSidebarData } from "../api/sidebar";
+
+
 
 export default function LoginPage() {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: "", password: "" });
+    const [form, setForm] = useState({
+        email: "",
+        password: "",
+        is_student: false
+    });
     const [error, setError] = useState("");
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value, type, checked } = e.target;
+        setForm({ ...form, [name]: type === "checkbox" ? checked : value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = login(form);
+        const success = await login(form); // login desde AuthContext
+
         if (success) {
-            navigate("/");
+            // fetch secciones para obtener el primer classId disponible
+            const sections = await getSidebarData();
+            const allItems = sections.flatMap((section) => section.items);
+            const firstClassId = allItems[0]?.to.replace("/", "");
+
+            if (firstClassId) {
+                navigate(`/class/${firstClassId}/overview`);
+            } else {
+                navigate("/"); // fallback
+            }
         } else {
             setError("Credenciales inválidas");
         }
     };
+
 
     return (
         <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -48,6 +68,16 @@ export default function LoginPage() {
                         value={form.password}
                         onChange={handleChange}
                         margin="normal"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={form.is_student}
+                                onChange={handleChange}
+                                name="is_student"
+                            />
+                        }
+                        label="Soy estudiante"
                     />
                     <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                         Iniciar sesión

@@ -48,14 +48,16 @@ export default function SideBarClassWork() {
                     id="outlined-number"
                     value={points}
                     type="number"
-                    onChange={(e) => setPoints(e.target.value)}
-                    slotProps={{
-                        inputLabel: {
-                            shrink: true,
-                        },
+                    onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (value <= 100) {
+                            setPoints(value);
+                        }
                     }}
+                    inputProps={{ max: 100, min: 0 }}
                 />
             </FormControl>
+
 
             <FormControl fullWidth sx={{ mb: 4 }}>
                 <Typography>Fecha límite</Typography>

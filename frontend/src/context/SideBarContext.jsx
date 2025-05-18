@@ -4,7 +4,7 @@ export const SideBarContext = createContext();
 
 function SideBarProvider({ children }) {
     const [open, setOpen] = useState(false);
-    const [classId, setClassId] = useState("")
+    const [classId, setClassId] = useState("default-id");
     const [points, setPoints] = useState(0);
     const [dueDate, setDueDate] = useState(null);
 
