@@ -12,6 +12,7 @@ import RegisterPage from "./pages/RegisterPage";
 import SideBarProvider from "./context/SideBarContext";
 import AuthProvider from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
+import GradesPage from "./pages/GradesPage";
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="work" element={<ClassWorkPage />} />
                 <Route path="people" element={<PeoplePage />} />
                 <Route path="createhomework" element={<CreateHomeWorkPage />} />
+                <Route path="grades" element={<GradesPage />} />
               </Route>
             </Route>
           </Routes>
