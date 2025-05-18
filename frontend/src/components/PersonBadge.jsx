@@ -11,8 +11,9 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-export default function PersonBadge({ person, selected, onToggle, type, options, onAction, showTopBorder }) {
+export default function PersonBadge({ person, selected, onSelect, type, options, showTopBorder }) {
     const isStudent = type === "students";
+    const isTeacher = type === "teachers";
 
     const [anchorEl, setAnchorEl] = useState(null);
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -26,7 +27,6 @@ export default function PersonBadge({ person, selected, onToggle, type, options,
         if (option === "Quitar") {
             console.log("Eliminando a: ", person.name)
         }
-        // Add more action handling as needed
         handleMenuClose();
     };
 
@@ -42,7 +42,7 @@ export default function PersonBadge({ person, selected, onToggle, type, options,
         >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                 {isStudent && (
-                    <Checkbox checked={selected} onChange={onToggle} />
+                    <Checkbox checked={selected} onChange={onSelect} />
                 )}
                 <Avatar sx={{ bgcolor: "#1976d2" }}>
                     {person.name.charAt(0).toUpperCase()}

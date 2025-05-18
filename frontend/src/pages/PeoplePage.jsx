@@ -3,18 +3,15 @@ import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import PersonList from "../components/PersonList";
 import {
     IconButton,
-    Menu,
-    MenuItem,
-    Avatar,
-    Checkbox,
     Typography,
     Box,
 } from "@mui/material";
 
 export default function PeoplePage() {
-    //👥 Participantes de la clase
     const teachers = [
         { id: 1, name: "Carlos Caraballo", email: "carlosC@example.com" },
+        { id: 1, name: "Pedro Calderon", email: "pedroC@example.com" },
+
     ];
     const students = [
         { id: 1, name: "Willy Quezada", email: "willy@example.com" },
@@ -25,12 +22,11 @@ export default function PeoplePage() {
 
     return (
         <Box>
-            <Box sx={{ width: "50%", margin: "0 auto", color: "#202020" }}>
+            <Box sx={{ width: "45%", margin: "0 auto", color: "#202020" }}>
                 <Box sx={{ pl: 2, mt: 5, mb: 2, display: "flex", width: "100%", justifyContent: "space-between", alignItems: "baseline" }}>
-
                     <Typography
                         component="h2"
-                        sx={{ fontSize: "32px", fontWeight: "400", color: "#202124" }}
+                        sx={{ fontSize: "38px", fontWeight: "400", color: "#202124" }}
                     >
                         Profesores
                     </Typography>
@@ -48,7 +44,7 @@ export default function PeoplePage() {
                     <Box sx={{ pl: 2, display: "flex", width: "95%", justifyContent: "space-between", alignItems: "baseline" }}>
                         <Typography
                             component="h2"
-                            sx={{ fontSize: "32px", fontWeight: "400", color: "#202124" }}
+                            sx={{ fontSize: "38px", fontWeight: "400", color: "#202124" }}
                         >
                             Alumnos
                         </Typography>
