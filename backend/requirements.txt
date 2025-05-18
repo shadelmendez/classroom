@@ -5,3 +5,6 @@ psycopg2-binary==2.9.10
 pydantic
 asyncpg
 databases
+bcrypt==4.2.0
+python-dotenv
+cryptography==40.0.2
