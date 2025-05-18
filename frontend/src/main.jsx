@@ -7,7 +7,7 @@ import theme from './theme';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      <CssBaseline /> {/* Normaliza estilos base */}
+      <CssBaseline />
       <App />
     </ThemeProvider>
   </StrictMode>,
