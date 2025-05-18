@@ -22,8 +22,8 @@ export default function AuthProvider({ children }) {
     // Registro con FastAPI
     const register = async (data) => {
         try {
-            const res = await registerUser(data);
-            setUser(res.data); // opcional
+            // const res = await registerUser(data);
+            setUser(data); // opcional
             return true;
         } catch (err) {
             console.error("Error al registrar usuario:", err);

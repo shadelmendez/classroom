@@ -83,7 +83,7 @@ export default function LoginPage() {
                         Iniciar sesión
                     </Button>
                     <Button fullWidth sx={{ mt: 1 }} onClick={() => navigate("/register")}>
-                        ¿No tienes cuenta? Regístrate
+                        Registrarme
                     </Button>
                 </form>
             </Paper>
