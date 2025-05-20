@@ -1,30 +1,21 @@
+import axios from "axios";
+
 export const getSidebarData = async () => {
-  // Simulated network delay
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  // Llama a la API para obtener los cursos (array)
+  const res = await axios.get("http://127.0.0.1:8000/subjects");
+  const subjects = res.data || [];
 
   const sidebarData = [
     {
-      title: "Cursos que dictas",
-      items: [
-        { to: "/discreta", label: "Matemática discreta", iconColor: "#456EBF" },
-        { to: "/monografico", label: "Monográfico", iconColor: "#BF7C41" },
-      ],
-    },
-    {
-      title: "Cursos inscritos",
-      items: [
-        { to: "/mate2024", label: "Matemáticas 2024", iconColor: "#6439BF" },
-        { to: "/sociales2024", label: "Sociales 2024", iconColor: "#49733D" },
-      ],
+      title: "Cursos",
+      items: subjects.map(subject => ({
+        to: `/class/${subject.id}/overview`,
+        label: subject.name,
+        iconColor: subject.icon_color || "#456EBF",
+        initial: subject.name.charAt(0).toUpperCase(),
+      })),
     },
   ];
-
-  // Add 'initial' property by extracting the first letter of each label
-  sidebarData.forEach((section) => {
-    section.items.forEach((item) => {
-      item.initial = item.label.charAt(0).toUpperCase(); // Get the first letter of the label and capitalize it
-    });
-  });
 
   return sidebarData;
 };

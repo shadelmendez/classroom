@@ -6,7 +6,7 @@ class ActivityInSubject(BaseModel):
     comment: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SubjectBase(BaseModel):
     name: str
@@ -21,4 +21,4 @@ class Subject(SubjectBase):
     activities: List[ActivityInSubject] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

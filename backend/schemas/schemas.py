@@ -7,7 +7,7 @@ class ActivityInSubject(BaseModel):
     comment: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SubjectBase(BaseModel):
@@ -25,7 +25,7 @@ class Subject(SubjectBase):
     activities: List[ActivityInSubject] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ActivityBase(BaseModel):
@@ -41,7 +41,7 @@ class Activity(ActivityBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AuthUserSchema(BaseModel):

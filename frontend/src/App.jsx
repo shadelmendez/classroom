@@ -33,7 +33,7 @@ export default function App() {
                 </PrivateRoute>
               }
             >
-              <Route index element={<HomePage />} />
+              <Route path="home" element={<HomePage/>} />
               <Route path="calendar" element={<div>Calendario</div>} />
               <Route
                 path="class/:classIdParam/*"

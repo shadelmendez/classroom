@@ -200,7 +200,7 @@ export default function Sidebar() {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/">
+            <ListItemButton component="a" href="/home">
               <ListItemIcon>{iconMap["Home"]}</ListItemIcon>
               <ListItemText primary="Página principal" />
             </ListItemButton>

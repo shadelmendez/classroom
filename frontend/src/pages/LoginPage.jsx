@@ -31,6 +31,7 @@ export default function LoginPage() {
         if (success) {
             // fetch secciones para obtener el primer classId disponible
             const sections = await getSidebarData();
+            console.log("section",sections);
             const allItems = sections.flatMap((section) => section.items);
             const firstClassId = allItems[0]?.to.replace("/", "");
 
