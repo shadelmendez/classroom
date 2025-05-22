@@ -1,3 +1,1 @@
-from .subject import *
-from .activity import *
-from .auth import *
+from .crud import *

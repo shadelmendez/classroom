@@ -1,7 +1,6 @@
 import {
     Box,
     TextField,
-    Button,
     FormControl,
     Radio,
     RadioGroup,
@@ -14,6 +13,7 @@ import {
 import { useState, useContext } from 'react';
 import { SideBarContext } from '../context/SideBarContext';
 import SideBarClassWork from '../components/SideBarClassWork';
+import { createTask } from '../api/api';
 
 export default function CreateHomeWorkPage() {
     const {
@@ -21,7 +21,8 @@ export default function CreateHomeWorkPage() {
         instructions, setInstructions,
         selectedTheme, setSelectedTheme,
         isQuestion,
-        themesData, setThemesData
+        themesData, points, dueDate,
+        setThemeId, reloadThemes
     } = useContext(SideBarContext);
 
     const theme = useTheme();
@@ -43,36 +44,55 @@ export default function CreateHomeWorkPage() {
         setOptions(updated);
     };
 
-    const handleSubmit = (e) => {
+    const getThemeIdByTitle = (title) => {
+        const theme = themesData.find(t => t.title === title);
+        console.log("theme ", theme, "title", title, "themesData", themesData)
+        const themeId = theme?.id;
+        console.log("themeId ", themeId)
+        setThemeId(themeId)
+        return themeId
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const newTask = {
-            title,
-            instructions,
-            type: isQuestion ? 'question' : 'task',
-            date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }),
-            options: isQuestion ? options : [],
-            correctAnswer: isQuestion ? selectedOption : null
-        };
+        try {
+            const taskPayload = {
+                title,
+                instructions,
+                type: isQuestion ? 'question' : 'task',
+                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }),
+                points: points,
+                due_date: dueDate?.format("YYYY-MM-DD") || null,
+                theme_id: getThemeIdByTitle(selectedTheme),
+                options: isQuestion
+                    ? options.map(opt => ({
+                        text: opt.text,
+                        identifier: opt.id,
+                        is_correct: opt.id === selectedOption
+                    }))
+                    : []
+            };
+            console.log("taskPayload ", taskPayload)
 
-        // Asignar al tema correspondiente
-        const updatedThemes = themesData.map(t =>
-            t.title === selectedTheme
-                ? { ...t, tasks: [...t.tasks, newTask] }
-                : t
-        );
-        setThemesData(updatedThemes);
+            await createTask(taskPayload);
 
-        // Reset
-        setTitle('');
-        setInstructions('');
-        setOptions([
-            { text: '', id: 'a' },
-            { text: '', id: 'b' },
-            { text: '', id: 'c' },
-        ]);
-        setSelectedOption('');
-        setSelectedTheme('');
+            // Recarga los temas actualizados
+            await reloadThemes();
+
+            // Reset form
+            setTitle('');
+            setInstructions('');
+            setOptions([
+                { text: '', id: 'a' },
+                { text: '', id: 'b' },
+                { text: '', id: 'c' },
+            ]);
+            setSelectedOption('');
+            setSelectedTheme('');
+        } catch (err) {
+            console.error("Error al guardar tarea:", err);
+        }
     };
 
     return (

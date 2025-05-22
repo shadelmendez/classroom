@@ -1,30 +1,31 @@
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Typography, Button, List, ListItem, ListItemText, Divider
+    Typography, Button, List, ListItem, ListItemText,
 } from '@mui/material';
 import { useContext } from 'react';
 import { SideBarContext } from '../context/SideBarContext';
+import { deleteTask } from '../api/api';
 
 export default function TaskDetailsDialog() {
-    const { selectedTask, setSelectedTask, themesData, setThemesData } = useContext(SideBarContext);
+    const {
+        selectedTask,
+        setSelectedTask,
+        reloadThemes
+    } = useContext(SideBarContext);
 
     const handleClose = () => {
         setSelectedTask(null);
     };
 
-    const handleDelete = () => {
-        const updatedThemes = themesData.map(theme => {
-            if (theme.title === selectedTask.theme) {
-                return {
-                    ...theme,
-                    tasks: theme.tasks.filter(task => task.title !== selectedTask.title)
-                };
-            }
-            return theme;
-        });
-
-        setThemesData(updatedThemes);
-        handleClose();
+    const handleDelete = async () => {
+        try {
+            await deleteTask(selectedTask.id);
+            await reloadThemes();
+        } catch (err) {
+            console.error("Error al eliminar tarea:", err);
+        } finally {
+            handleClose();
+        }
     };
 
     if (!selectedTask) return null;

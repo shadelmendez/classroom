@@ -31,7 +31,6 @@ import MailIcon from "@mui/icons-material/Mail";
 import GroupIcon from '@mui/icons-material/Group';
 import SchoolIcon from '@mui/icons-material/School';
 import logo from "../assets/logo.svg"
-import { getSidebarData } from "../api/sidebar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { SideBarContext } from "../context/SideBarContext";
@@ -39,7 +38,7 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import AddToDriveOutlinedIcon from '@mui/icons-material/AddToDriveOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { AuthContext } from "../context/AuthContext";
-
+import { getSubjects } from "../api/api";
 
 
 // #region configuracion de material ui para el componente
@@ -112,12 +111,31 @@ export default function Sidebar() {
 
 
   useEffect(() => {
-    const load = async () => {
-      const data = await getSidebarData();
-      setSections(data);
+    const loadSubjects = async () => {
+      try {
+        const res = await getSubjects();
+        const subjects = res.data;
+
+        const dynamicSections = [
+          {
+            title: "Cursos que dictas",
+            items: subjects.map((subject) => ({
+              to: subject.name, // este será usado en las rutas como classId
+              label: subject.name,
+              iconColor: subject.icon_color || "#1976d2"
+            })),
+          },
+        ];
+
+        setSections(dynamicSections);
+      } catch (err) {
+        console.error("Error cargando subjects:", err);
+      }
     };
-    load();
+
+    loadSubjects();
   }, []);
+
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -166,7 +184,7 @@ export default function Sidebar() {
               </Typography>
               <ChevronRightIcon sx={{ color: theme.palette.custom.icons }} />
               <Link href="#" underline="hover" sx={{ color: theme.palette.text.primary }}>
-                <Typography variant="body2" fontWeight="600">Monográfico</Typography>
+                <Typography variant="body2" fontWeight="600">{classId}</Typography>
                 <Typography variant="caption">01</Typography>
               </Link>
             </Box>

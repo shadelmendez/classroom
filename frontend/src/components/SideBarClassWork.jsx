@@ -45,17 +45,14 @@ export default function SideBarClassWork() {
             <FormControl fullWidth sx={{ mb: 4 }}>
                 <Typography>Puntos</Typography>
                 <TextField
-                    id="outlined-number"
-                    value={points}
                     type="number"
+                    value={points}
                     onChange={(e) => {
-                        const value = Number(e.target.value);
-                        if (value <= 100) {
-                            setPoints(value);
-                        }
+                        const val = e.target.value;
+                        setPoints(val === '' ? '' : Number(val));
                     }}
-                    inputProps={{ max: 100, min: 0 }}
                 />
+
             </FormControl>
 
 

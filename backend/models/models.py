@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean
+from datetime import datetime
 
 
 class Activity(Base):
@@ -32,3 +33,46 @@ class AuthUser(Base):
     email = Column(String, index=True)
     password = Column(String)
     is_student = Column(Boolean, default=False)
+
+
+class Theme(Base):
+    __tablename__ = "themes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    subject_id = Column(Integer, ForeignKey("subjects.id"))
+
+    subject = relationship("Subject", back_populates="themes")
+    tasks = relationship("Task", back_populates="theme", cascade="all, delete")
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    instructions = Column(Text)
+    type = Column(String, nullable=False)  # 'task' o 'question'
+    date = Column(String)
+    points = Column(Integer)
+    due_date = Column(String)
+    theme_id = Column(Integer, ForeignKey("themes.id"))
+
+    theme = relationship("Theme", back_populates="tasks")
+    options = relationship("Option", back_populates="task", cascade="all, delete")
+
+
+class Option(Base):
+    __tablename__ = "options"
+
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String)
+    identifier = Column(String)  # 'a', 'b', 'c', etc.
+    is_correct = Column(Boolean, default=False)
+    task_id = Column(Integer, ForeignKey("tasks.id"))
+
+    task = relationship("Task", back_populates="options")
+
+
+# Actualiza el modelo Subject para que relacione con Theme
+Subject.themes = relationship("Theme", back_populates="subject", cascade="all, delete")
