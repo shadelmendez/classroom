@@ -33,6 +33,7 @@ export default function App() {
                 </PrivateRoute>
               }
             >
+              <Route index element={<HomePage />} />
               <Route path="home" element={<HomePage/>} />
               <Route path="calendar" element={<div>Calendario</div>} />
               <Route
@@ -43,7 +44,7 @@ export default function App() {
                   </PrivateRoute>
                 }
               >
-                <Route index element={<OverviewPage />} />
+                
                 <Route path="overview" element={<OverviewPage />} />
                 <Route path="work" element={<ClassWorkPage />} />
                 <Route path="people" element={<PeoplePage />} />

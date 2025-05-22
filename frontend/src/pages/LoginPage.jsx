@@ -36,7 +36,7 @@ export default function LoginPage() {
             const firstClassId = allItems[0]?.to.replace("/", "");
 
             if (firstClassId) {
-                navigate(`/class/${firstClassId}/overview`);
+                navigate(`/home`);
             } else {
                 navigate("/"); // fallback
             }

@@ -20,6 +20,8 @@ class Subject(Base):
     name = Column(String, index=True)
     description = Column(String)
     icon_color = Column(String)
+    educator_id = Column(Integer, ForeignKey("users.id"))  # NEW FIELD
+    educator = relationship("AuthUser")  # NEW RELATIONSHIP
     activities = relationship(
         "Activity", back_populates="subject", cascade="all, delete"
     )

@@ -102,7 +102,7 @@ const iconMap = {
 };
 
 
-export default function Sidebar() {
+export default function Sidebar({ children }) {
   const theme = useTheme();
 
   const { open, setOpen, setClassId, classId } = useContext(SideBarContext)
@@ -132,6 +132,7 @@ export default function Sidebar() {
     location.pathname.includes(route)
   );
   const tabValue = currentTab === -1 ? 0 : currentTab; // Valor válido siempre
+  const isHome = location.pathname === "/home" || location.pathname === "/";
 
 
   const handleTabChanged = (event, newValue) => {
@@ -257,20 +258,22 @@ export default function Sidebar() {
       {/* Contenido principal */}
       <Main open={open}>
         <DrawerHeader />
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
-          <Tabs value={tabValue} onChange={handleTabChanged}>
-            <Tab label="Novedades" />
-            <Tab label="Trabajo en clase" />
-            <Tab label="Personas" />
-            {!user?.is_student && <Tab label="Calificaciones" />}
-          </Tabs>
-
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
-            <CalendarTodayOutlinedIcon fontSize="small" />
-            <AddToDriveOutlinedIcon fontSize="small" />
-            <SettingsOutlinedIcon fontSize="small" />
+        {!isHome && (
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
+            <Tabs value={tabValue} onChange={handleTabChanged}>
+              <Tab label="Novedades" />
+              <Tab label="Trabajo en clase" />
+              <Tab label="Personas" />
+              {!user?.is_student && <Tab label="Calificaciones" />}
+            </Tabs>
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
+              <CalendarTodayOutlinedIcon fontSize="small" />
+              <AddToDriveOutlinedIcon fontSize="small" />
+              <SettingsOutlinedIcon fontSize="small" />
+            </Box>
           </Box>
-        </Box>
+        )}
+        {children}
       </Main>
     </Box>
   );

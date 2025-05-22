@@ -14,6 +14,7 @@ class SubjectBase(BaseModel):
     name: str
     description: str
     icon_color: str
+    educator_id: int
 
 
 class SubjectCreate(SubjectBase):

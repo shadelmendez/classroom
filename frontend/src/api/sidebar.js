@@ -9,7 +9,7 @@ export const getSidebarData = async () => {
     {
       title: "Cursos",
       items: subjects.map(subject => ({
-        to: `/class/${subject.id}/overview`,
+        to: `/${subject.id}`,
         label: subject.name,
         iconColor: subject.icon_color || "#456EBF",
         initial: subject.name.charAt(0).toUpperCase(),
