@@ -2,12 +2,11 @@ import { Outlet, useParams } from "react-router-dom";
 import { Typography, Box } from "@mui/material";
 import { useContext, useEffect } from "react";
 import { SideBarContext } from "../context/SideBarContext";
-import TextField from '@mui/material/TextField';
 
 
 export default function ClassLayout() {
     const { classIdParam } = useParams();
-    const { open, classId, setClassId } = useContext(SideBarContext);
+    const { open, setClassId } = useContext(SideBarContext);
 
     useEffect(() => {
         if (classIdParam) {

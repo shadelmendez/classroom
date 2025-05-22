@@ -2,9 +2,8 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
-    Box, Button, TextField, Typography, Paper, FormControlLabel, Checkbox
+    Box, Button, TextField, Typography, Paper,
 } from "@mui/material";
-import { loginUser } from "../api/api";
 import { getSidebarData } from "../api/sidebar";
 
 
@@ -68,16 +67,6 @@ export default function LoginPage() {
                         value={form.password}
                         onChange={handleChange}
                         margin="normal"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={form.is_student}
-                                onChange={handleChange}
-                                name="is_student"
-                            />
-                        }
-                        label="Soy estudiante"
                     />
                     <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                         Iniciar sesión

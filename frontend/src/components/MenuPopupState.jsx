@@ -1,29 +1,62 @@
-import { Button, Menu, MenuItem, Dialog, DialogTitle, DialogActions, DialogContent, TextField, Divider } from '@mui/material';
+import {
+    Button, Menu, MenuItem, Dialog, DialogTitle,
+    DialogActions, DialogContent, TextField, Divider
+} from '@mui/material';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
-import { Add as AddIcon, ArticleOutlined, HelpCenterOutlined, ViewListOutlined } from '@mui/icons-material';
+import {
+    Add as AddIcon, ArticleOutlined, HelpCenterOutlined, ViewListOutlined
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
-import { SideBarContext } from '../context/SideBarContext';
+import { SideBarContext } from '../context/SideBarContext'
+import { getSubjects, createTheme } from '../api/api';
 
 export default function MenuPopupState() {
-    const { setIsQuestion, setThemeTitle, themeTitle, setThemesData, classId } = useContext(SideBarContext);
+    const {
+        setIsQuestion,
+        setThemeTitle,
+        themeTitle,
+        classId,
+        reloadThemes
+    } = useContext(SideBarContext);
+
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
+    const [error, setError] = useState("");
 
     const handleNavigation = (type) => {
-        if (type === 'question') {
-            setIsQuestion(true);
-        } else {
-            setIsQuestion(false);
-        }
+        setIsQuestion(type === 'question');
         navigate(`/class/${classId}/createhomework`);
     };
 
-    const handleAddTheme = () => {
-        if (themeTitle.trim()) {
-            setThemesData(prev => [...prev, { title: themeTitle, tasks: [] }]);
+    const handleAddTheme = async () => {
+        if (!themeTitle.trim()) {
+            setError("El título no puede estar vacío.");
+            return;
+        }
+
+        try {
+            const allSubjects = await getSubjects();
+            const target = allSubjects.data.find(s => s.name === classId);
+            if (!target) {
+                setError("No hay clases registradas o la clase actual no existe.");
+                return;
+            }
+
+            await createTheme({
+                title: themeTitle,
+                subject_id: target.id,
+            });
+
+            await reloadThemes();
+
+            // Reset
             setThemeTitle('');
             setOpenDialog(false);
+            setError('');
+        } catch (err) {
+            console.error("Error al crear tema:", err);
+            setError("No se pudo crear el tema. Verifica el nombre de la clase.");
         }
     };
 
@@ -59,10 +92,14 @@ export default function MenuPopupState() {
                         value={themeTitle}
                         onChange={(e) => setThemeTitle(e.target.value)}
                         fullWidth
+                        error={!!error}
+                        helperText={error}
+                        autoFocus
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleAddTheme}>Agregar</Button>
+                    <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
+                    <Button onClick={handleAddTheme} variant="contained">Agregar</Button>
                 </DialogActions>
             </Dialog>
         </>

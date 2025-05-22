@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import Base, engine
-from routers import subject, activity, auth
+from routers import subject, activity, auth, tasks, themes
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="School API")
@@ -23,3 +23,5 @@ Base.metadata.create_all(bind=engine)
 app.include_router(subject.router)
 app.include_router(activity.router)
 app.include_router(auth.router)
+app.include_router(tasks.router)
+app.include_router(themes.router)
