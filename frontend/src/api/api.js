@@ -20,6 +20,13 @@ export const getUsers = () => API.get("/auth/users");
 // ----------------------
 export const createSubject = (data) => API.post("/subjects/", data);
 export const getSubjects = () => API.get("/subjects/");
+export const getSubjectByName = (name) => API.get(`/subjects/by-name/${name}`);
+export const getEnrolledSubjects = (userId) => API.get(`/subjects/enrolled/${userId}`);
+export const getTeachedSubjects = (userId) => API.get(`/subjects/by-educator/${userId}`);
+
+// ----------------------
+// ACTIVITIES (Actividades)
+export const getActivitiesBySubject = (SubjectId) => API.get(`/activities/read-by-subject-id/${SubjectId}`);
 
 // ----------------------
 // THEMES (Temas por clase)
@@ -30,7 +37,6 @@ export const getThemesBySubject = (subjectId) => {
   return API.get(`/themes/subject/${subjectId}`);
 };
 
-export const getSubjectByName = (name) => API.get(`/subjects/by-name/${name}`);
 export const createTheme = (data) => API.post("/themes/", data);
 
 // ----------------------

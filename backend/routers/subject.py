@@ -38,6 +38,11 @@ def delete_subject(subject_id: int, db: Session = Depends(database.get_db)):
 def get_subject_by_name(name: str, db: Session = Depends(database.get_db)):
     return crud_get_subject_by_name(db, name)
 
+@router.get("/by-educator/{educator_id}", response_model=list[SubjectSchemas])
+def get_subjects_by_educator_id(educator_id: int, db: Session = Depends(database.get_db)):
+    return crud_get_subjects_by_educator_id(db, educator_id)
+
+
 
 @router.post("/themes/", response_model=ThemeSchemas)
 def create_theme(theme: ThemeCreateSchemas, db: Session = Depends(database.get_db)):

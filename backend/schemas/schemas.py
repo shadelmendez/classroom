@@ -92,6 +92,7 @@ class SubjectBaseSchemas(BaseModel):
     name: str
     description: str
     icon_color: str
+    educator_id: int
 
 
 class SubjectCreateSchemas(SubjectBaseSchemas):

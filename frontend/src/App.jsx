@@ -34,6 +34,7 @@ export default function App() {
               }
             >
               <Route index element={<HomePage />} />
+              <Route path="home" element={<HomePage />} />
               <Route path="calendar" element={<div>Calendario</div>} />
               <Route
                 path="class/:classIdParam/*"
@@ -43,7 +44,6 @@ export default function App() {
                   </PrivateRoute>
                 }
               >
-                <Route index element={<OverviewPage />} />
                 <Route path="overview" element={<OverviewPage />} />
                 <Route path="work" element={<ClassWorkPage />} />
                 <Route path="people" element={<PeoplePage />} />

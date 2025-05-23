@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { getSubjects } from "../api/api";
 import {
     Box, Button, TextField, Typography, Paper,
 } from "@mui/material";
-import { getSidebarData } from "../api/sidebar";
 
 
 
@@ -24,24 +24,25 @@ export default function LoginPage() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const success = await login(form); // login desde AuthContext
+    e.preventDefault();
+    const success = await login(form); // login desde AuthContext
 
-        if (success) {
-            // fetch secciones para obtener el primer classId disponible
-            const sections = await getSidebarData();
-            const allItems = sections.flatMap((section) => section.items);
-            const firstClassId = allItems[0]?.to.replace("/", "");
+    if (success) {
+        // fetch secciones para obtener el primer classId disponible
+        const sections = await getSubjects();
+        // sections is already an array of subjects
+        const allItems = sections.data || sections; // handle both cases
+        const firstClassId = allItems[0]?.id?.toString().replace("/", "");
 
-            if (firstClassId) {
-                navigate(`/class/${firstClassId}/overview`);
-            } else {
-                navigate("/"); // fallback
-            }
+        if (firstClassId) {
+            navigate(`/home`);
         } else {
-            setError("Credenciales inválidas");
+            navigate("/"); // fallback
         }
-    };
+    } else {
+        setError("Credenciales inválidas");
+    }
+};
 
 
     return (

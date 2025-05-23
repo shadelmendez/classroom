@@ -42,6 +42,8 @@ def crud_get_subject(db: Session, subject_id: int):
 def crud_get_subject_by_name(db: Session, name: str):
     return db.query(Subject).filter(Subject.name == name).first()
 
+def crud_get_subjects_by_educator_id(db: Session, educator_id: int, skip: int = 0, limit: int = 100):
+    return db.query(Subject).filter(Subject.educator_id == educator_id).offset(skip).limit(limit).all()
 
 def crud_delete_subject(db: Session, subject_id: int):
     subject = crud_get_subject(db, subject_id)
@@ -176,6 +178,9 @@ def crud_get_activities(db: Session, skip: int = 0, limit: int = 100):
 
 def crud_get_activity(db: Session, activity_id: int):
     return db.query(Activity).filter(Activity.id == activity_id).first()
+
+def crud_get_activity_by_subject_id(db: Session, subject_id: int):
+    return db.query(Activity).filter(Activity.subject_id == subject_id).all()
 
 
 def crud_delete_activity(db: Session, activity_id: int):

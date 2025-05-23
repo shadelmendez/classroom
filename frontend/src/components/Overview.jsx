@@ -1,12 +1,13 @@
-import { getOverviewData } from "../api/overview"; 
 import React, { useEffect, useState, useContext } from "react";
 import { Box, Typography, Card, Grid, TextField, Button, useTheme } from "@mui/material";
-import { getSidebarData } from "../api/sidebar";
 import { SideBarContext } from "../context/SideBarContext";
+import { AuthContext } from "../context/AuthContext";
+import { getSubjectByName, getActivitiesBySubject } from "../api/api";
 
 const Overview = () => {
   const theme = useTheme();
   const { classId } = useContext(SideBarContext);
+  const { user } = useContext(AuthContext);
 
   const [courseLabel, setCourseLabel] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -14,39 +15,49 @@ const Overview = () => {
   const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
-    const fetchCourseLabel = async () => {
-      const sections = await getSidebarData();
-      const allItems = sections.flatMap(section => section.items);
-      const found = allItems.find(item => item.to.replace("/", "") === classId);
-      setCourseLabel(found ? found.label : "");
-    };
-
     const fetchOverviewData = async () => {
-      const data = await getOverviewData();
-      setTasks(data.tasks || []);
-      setComments(data.comments || []);
+      if (!classId) return;
+      // First, get the subject by name to obtain its id
+      const subjectRes = await getSubjectByName(classId);
+      const subject = subjectRes.data;
+      setCourseLabel(subject?.name || "");
+
+      if (subject?.id) {
+        const response = await getActivitiesBySubject(subject.id);
+        const activities = response.data;
+        const comments = Array.isArray(activities)
+          ? activities.filter(item => item.comment)
+          : [];
+        setComments(comments);
+        // setTasks(...) if needed
+      } else {
+        setTasks([]);
+        setComments([]);
+      }
     };
 
-    fetchCourseLabel();
     fetchOverviewData();
   }, [classId]);
-
   const handleAddComment = () => {
     if (newComment.trim()) {
       setComments([
         ...comments,
-        { user: "Tú", date: "Ahora", text: newComment.trim() },
+        {
+          user: user?.name || "Tú",
+          date: "Ahora",
+          text: newComment.trim(),
+        },
       ]);
       setNewComment("");
     }
   };
 
   return (
-    <Box sx={{ 
-      padding: 3, 
-      backgroundColor: theme.palette.background.default, 
-      color: theme.palette.text.primary, 
-      minHeight: "100vh" 
+    <Box sx={{
+      padding: 3,
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.text.primary,
+      minHeight: "100vh"
     }}>
       {/* Header Section estilo Google Classroom */}
       <Box
@@ -111,7 +122,7 @@ const Overview = () => {
               sx={{
                 backgroundColor: theme.palette.background.paper,
                 color: theme.palette.text.primary,
-                border: `1px solid ${theme.palette.divider}`,
+                border: `10px solid ${theme.palette.divider}`,
                 borderRadius: 2,
                 padding: 2,
                 display: "flex",
@@ -187,16 +198,16 @@ const Overview = () => {
                 fontSize: 20,
               }}
             >
-              {comment.user.charAt(0)}
+              {(comment.user ? comment.user.charAt(0) : "A")}
             </Box>
             <Box>
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                {comment.user}
+                {comment.user || "Anónimo"}
               </Typography>
               <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                {comment.date}
+                {comment.date || ""}
               </Typography>
-              <Typography variant="body2">{comment.text}</Typography>
+              <Typography variant="body2">{comment.text || comment.comment}</Typography>
             </Box>
           </Box>
         ))}
