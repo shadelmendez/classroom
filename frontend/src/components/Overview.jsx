@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { Box, Typography, Card, Grid, TextField, Button, useTheme } from "@mui/material";
 import { SideBarContext } from "../context/SideBarContext";
 import { AuthContext } from "../context/AuthContext";
-import { getSubjectByName, getActivitiesBySubject } from "../api/api";
+import { getSubjectByName, getActivitiesBySubject, getUsers, createActivities } from "../api/api";
 
 const Overview = () => {
   const theme = useTheme();
@@ -10,9 +10,24 @@ const Overview = () => {
   const { user } = useContext(AuthContext);
 
   const [courseLabel, setCourseLabel] = useState("");
+  const [courseSection, setCourseSection] = useState(""); // NEW
   const [tasks, setTasks] = useState([]);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [users, setUsers] = useState({});
+
+  // Fetch all users once
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await getUsers();
+      const usersById = {};
+      res.data.forEach(u => {
+        usersById[u.id] = u;
+      });
+      setUsers(usersById);
+    };
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const fetchOverviewData = async () => {
@@ -21,6 +36,7 @@ const Overview = () => {
       const subjectRes = await getSubjectByName(classId);
       const subject = subjectRes.data;
       setCourseLabel(subject?.name || "");
+      setCourseSection(subject?.section || ""); // NEW
 
       if (subject?.id) {
         const response = await getActivitiesBySubject(subject.id);
@@ -38,17 +54,39 @@ const Overview = () => {
 
     fetchOverviewData();
   }, [classId]);
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      setComments([
-        ...comments,
-        {
-          user: user?.name || "Tú",
-          date: "Ahora",
-          text: newComment.trim(),
-        },
-      ]);
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+    if (!user?.id || !classId) return;
+
+    // Get subject info to get subject_id
+    const subjectRes = await getSubjectByName(classId);
+    const subject = subjectRes.data;
+
+    if (!subject?.id) return;
+
+    // Prepare activity data
+    const activityData = {
+      comment: newComment.trim(),
+      subject_id: subject.id,
+      user_id: user.id,
+    };
+
+    try {
+      // Post the new comment/activity
+      await createActivities(activityData);
+
+      // Optionally, refresh comments from backend
+      const response = await getActivitiesBySubject(subject.id);
+      const activities = response.data;
+      const comments = Array.isArray(activities)
+        ? activities.filter(item => item.comment)
+        : [];
+      setComments(comments);
+
       setNewComment("");
+    } catch (err) {
+      // Optionally handle error
+      console.error("Error al crear el comentario:", err);
     }
   };
 
@@ -88,15 +126,14 @@ const Overview = () => {
             {courseLabel}
           </Typography>
           <Typography
-            variant="subtitle1"
+            variant="body2"
             sx={{
-              color: "#fff",
-              opacity: 0.85,
-              fontSize: 22,
+              color: "#e0e0e0",
               fontWeight: 400,
+              letterSpacing: 1,
             }}
           >
-            01
+            {courseSection || "—"}
           </Typography>
         </Box>
         <Box
@@ -198,11 +235,11 @@ const Overview = () => {
                 fontSize: 20,
               }}
             >
-              {(comment.user ? comment.user.charAt(0) : "A")}
+              {(users[comment.user_id]?.email ? users[comment.user_id].email.charAt(0).toUpperCase() : "A")}
             </Box>
             <Box>
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                {comment.user || "Anónimo"}
+                {users[comment.user_id]?.email || "Anónimo"}
               </Typography>
               <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                 {comment.date || ""}

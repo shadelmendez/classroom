@@ -26,7 +26,8 @@ export const getTeachedSubjects = (userId) => API.get(`/subjects/by-educator/${u
 
 // ----------------------
 // ACTIVITIES (Actividades)
-export const getActivitiesBySubject = (SubjectId) => API.get(`/activities/read-by-subject-id/${SubjectId}`);
+export const createActivities = (data) => API.post("/activities/",data);
+export const getActivitiesBySubject = (subjectId) => API.get(`/activities/read-by-subject-id/${subjectId}`);
 
 // ----------------------
 // THEMES (Temas por clase)

@@ -10,8 +10,9 @@ class Activity(Base):
     id = Column(Integer, primary_key=True, index=True)
     comment = Column(String)
     subject_id = Column(Integer, ForeignKey("subjects.id"))
-
+    user_id = Column(Integer, ForeignKey("users.id"))
     subject = relationship("Subject", back_populates="activities")
+    user = relationship("AuthUser")
 
 
 class Subject(Base):
@@ -21,6 +22,7 @@ class Subject(Base):
     name = Column(String, index=True)
     description = Column(String)
     icon_color = Column(String)
+    section = Column(String)
     educator_id = Column(Integer, ForeignKey("users.id"))
     educator = relationship("AuthUser")
     activities = relationship(

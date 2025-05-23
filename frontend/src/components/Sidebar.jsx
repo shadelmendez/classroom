@@ -110,7 +110,8 @@ export default function Sidebar() {
             items: teachedSubjects.map((subject) => ({
               to: subject.name,
               label: subject.name,
-              iconColor: subject.icon_color || "#1976d2"
+              iconColor: subject.icon_color || "#1976d2",
+              section: subject.section, // <-- add this
             })),
           },
           {
@@ -225,7 +226,10 @@ export default function Sidebar() {
                     <ListItemIcon sx={{ color: item.iconColor || theme.palette.custom.icons }}>
                       {<Avatar sx={{ width: 28, height: 28, backgroundColor: item.iconColor }}>{item.label[0]}</Avatar>}
                     </ListItemIcon>
-                    <ListItemText secondary={item.label} />
+                    <ListItemText 
+                      primary={item.label}
+                      secondary={item.section}
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}

@@ -1,21 +1,27 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Box, Typography, Card, CardContent, Avatar, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem } from "@mui/material";
+import { Box, Typography, Card, CardContent, Avatar, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { SideBarContext } from "../context/SideBarContext";
 import { AuthContext } from "../context/AuthContext";
 import { getEnrolledSubjects, getTeachedSubjects, createSubject } from "../api/api";
 
 const ICON_COLORS = [
-  { label: "Azul", value: "blue" },
-  { label: "Verde", value: "green" },
-  { label: "Rojo", value: "red" },
-  { label: "Morado", value: "purple" },
+  { label: "Azul brillante", value: "#0080C9" },
+  { label: "Azul cielo", value: "#448BF6" },
+  { label: "Verde esmeralda", value: "#21B573" },
+  { label: "Gris oscuro", value: "#1E1E1E" },
+  { label: "Amarillo mostaza", value: "#F4C542" },
+  { label: "Coral suave", value: "#FF6B6B" },
+  { label: "Azul pizarra", value: "#4B6CB7" },
+  { label: "Verde menta", value: "#2ECC71" },
+  { label: "Naranja cálido", value: "#FF9F1C" },
+  { label: "Gris frío", value: "#A0AEC0" },
 ];
 
 export default function HomeComponent() {
   const [subjects, setSubjects] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [form, setForm] = useState({ name: "", description: "", icon_color: "" });
+  const [form, setForm] = useState({ name: "", description: "", section: "" }); 
   const [formError, setFormError] = useState("");
   const navigate = useNavigate();
   const { setClassId } = useContext(SideBarContext);
@@ -71,7 +77,7 @@ export default function HomeComponent() {
   };
 
   const handleOpenDialog = () => {
-    setForm({ name: "", description: "", icon_color: "" });
+    setForm({ name: "", description: "", section: "" });
     setFormError("");
     setOpenDialog(true);
   };
@@ -86,14 +92,15 @@ export default function HomeComponent() {
   };
 
   const handleCreateSubject = async () => {
-    if (!form.name.trim() || !form.description.trim() || !form.icon_color) {
+    if (!form.name.trim() || !form.description.trim() || !form.section.trim()) {
       setFormError("Todos los campos son obligatorios.");
       return;
     }
+    const randomColor = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)].value;
     try {
-      // Agrega educator_id al enviar los datos
       await createSubject({
         ...form,
+        icon_color: randomColor,
         educator_id: user.id,
       });
       setOpenDialog(false);
@@ -112,7 +119,14 @@ export default function HomeComponent() {
           Crear clase
         </Button>
       </Box>
-      <Grid container spacing={2} alignItems="stretch">
+      <Grid
+        container
+        spacing={2}
+        alignItems="stretch"
+        sx={{
+          justifyContent: "flex-start", // or "center" if you want centered rows
+        }}
+      >
         {subjects.map((subject) => (
           <Grid
             item
@@ -123,22 +137,24 @@ export default function HomeComponent() {
             sx={{
               display: "flex",
               flexDirection: "column",
+              alignItems: "stretch",
             }}
           >
             <Card
               sx={{
-                borderRadius: 2,
-                boxShadow: 1,
+                borderRadius: 3,
+                boxShadow: 4,
                 cursor: "pointer",
                 overflow: "hidden",
-                height: 300,
-                width: "100%",
+                height: 320,           // FIXED HEIGHT
+                width: "100%",         // FILL GRID COLUMN
+                minWidth: 0,           // Prevent overflow
                 display: "flex",
                 flexDirection: "column",
                 transition: "box-shadow 0.2s, transform 0.2s",
                 "&:hover": {
-                  boxShadow: 3,
-                  transform: "translateY(-2px)",
+                  boxShadow: 10,
+                  transform: "translateY(-4px) scale(1.03)",
                 },
               }}
               onClick={() => handleCardClick(subject)}
@@ -191,7 +207,7 @@ export default function HomeComponent() {
                       letterSpacing: 1,
                     }}
                   >
-                    01
+                    {subject.section || "—"}
                   </Typography>
                 </Box>
                 {/* Floating avatar */}
@@ -268,20 +284,13 @@ export default function HomeComponent() {
             margin="normal"
           />
           <TextField
-            select
-            label="Color del ícono"
-            name="icon_color"
-            value={form.icon_color}
+            label="Sección"
+            name="section"
+            value={form.section}
             onChange={handleFormChange}
             fullWidth
             margin="normal"
-          >
-            {ICON_COLORS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
+          />
           {formError && (
             <Typography color="error" sx={{ mt: 1 }}>
               {formError}
