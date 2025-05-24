@@ -24,7 +24,7 @@ export default function RegisterPage() {
         e.preventDefault();
         try {
             const res = await registerUser(form);
-            register(res.data); // opcional: guardar en contexto
+            register(res.data);
             navigate(`/class/${classId}/overview`);
         } catch (err) {
             console.log(err)

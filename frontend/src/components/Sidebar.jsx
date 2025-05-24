@@ -88,9 +88,9 @@ export default function Sidebar() {
         let teachedSubjects = [];
         try {
           const teachedRes = await getTeachedSubjects(user.id);
-          console.log("teach",teachedRes);
+          console.log("teach", teachedRes);
           teachedSubjects = teachedRes.data;
-          console.log("teach",teachedRes);
+          console.log("teach", teachedRes);
         } catch (e) {
           teachedSubjects = [];
           console.log("picis");
@@ -193,13 +193,14 @@ export default function Sidebar() {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/home">
+            <ListItemButton component={RouterLink} to="/">
               <ListItemIcon>{iconMap["Home"]}</ListItemIcon>
               <ListItemText primary="Página principal" />
             </ListItemButton>
+
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/calendar">
+            <ListItemButton component={RouterLink} to="/calendar">
               <ListItemIcon>{iconMap["Calendar"]}</ListItemIcon>
               <ListItemText primary="Calendario" />
             </ListItemButton>
@@ -226,7 +227,7 @@ export default function Sidebar() {
                     <ListItemIcon sx={{ color: item.iconColor || theme.palette.custom.icons }}>
                       {<Avatar sx={{ width: 28, height: 28, backgroundColor: item.iconColor }}>{item.label[0]}</Avatar>}
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary={item.label}
                       secondary={item.section}
                     />
@@ -240,7 +241,7 @@ export default function Sidebar() {
 
         <List>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/">
+            <ListItemButton component={RouterLink} to="/">
               <ListItemIcon>{iconMap["Settings"]}</ListItemIcon>
               <ListItemText primary="Configuración" />
             </ListItemButton>

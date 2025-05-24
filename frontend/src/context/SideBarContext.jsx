@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import { getSubjectByName, getSubjects } from '../api/api';
+import { getSubjectByName, getSubjects, getUngradedTasksForStudent } from '../api/api';
 
 export const SideBarContext = createContext();
 
@@ -17,6 +17,36 @@ function SideBarProvider({ children }) {
     const [points, setPoints] = useState('');
     const [dueDate, setDueDate] = useState(null);
     const [themeId, setThemeId] = useState(null);
+
+    const [isScored, setIsScored] = useState(false)
+
+    const [students, setStudents] = useState([
+        {
+            id: 1,
+            name: 'Janeiro Placido',
+            avatar: 'J',
+            assignedTasks: [1, 2]
+        },
+        {
+            id: 2,
+            name: 'Willy Q.V',
+            avatar: 'W',
+            assignedTasks: [2]
+        }
+    ]); //esto deberia ser de la ruta de people
+
+    const fetchUnscoredTasks = async (studentId) => {
+        const res = await getUngradedTasksForStudent(studentId);
+        const taskIds = res.data.map(task => task.id);
+
+        setStudents(prev => prev.map(st => ({
+            ...st,
+            assignedTasks: taskIds
+        })));
+    };
+
+
+    const [selectedStudents, setSelectedStudents] = useState([]);
 
     //Función reutilizable para cargar temas
     const reloadThemes = async (forceClassId) => {
@@ -39,9 +69,16 @@ function SideBarProvider({ children }) {
         }
     };
 
-    // Ejecutar al cambiar de clase
     useEffect(() => {
         reloadThemes();
+
+        // aqui deberia ir los ids de los estudiantes creados en la db
+        const loadUngraded = async () => {
+            await fetchUnscoredTasks(1); // Janeiro Placido
+            await fetchUnscoredTasks(2); // Willy Q.V
+        };
+
+        loadUngraded();
     }, [classId]);
 
     return (
@@ -59,6 +96,10 @@ function SideBarProvider({ children }) {
             dueDate, setDueDate,
             themeId, setThemeId,
             reloadThemes,
+            students, setStudents,
+            selectedStudents, setSelectedStudents,
+            fetchUnscoredTasks,
+            isScored, setIsScored
         }}>
             {children}
         </SideBarContext.Provider>

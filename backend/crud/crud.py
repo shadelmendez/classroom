@@ -2,20 +2,15 @@ from sqlalchemy.orm import Session
 from schemas import *
 from models import *
 from fastapi import HTTPException
-
 from models import AuthUser
 from schemas import *
-
-# import bcrypt
 from collections import OrderedDict
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import os
-import logging
 
 load_dotenv()
 
-# Create a cipher suite
 cipher_suite = Fernet(os.getenv("SECRET_KEY"))
 
 
@@ -68,7 +63,6 @@ def crud_create_theme(db: Session, theme: ThemeCreateSchemas):
 # endregion THEMES
 
 
-# region TASKS
 def crud_create_task(db: Session, task_data: TaskCreateSchemas):
     db_task = Task(
         title=task_data.title,
@@ -92,6 +86,10 @@ def crud_create_task(db: Session, task_data: TaskCreateSchemas):
         )
         db.add(db_option)
 
+    for student_id in task_data.student_ids:
+        link = StudentTask(student_id=student_id, task_id=db_task.id)
+        db.add(link)
+
     db.commit()
     db.refresh(db_task)
     return db_task
@@ -107,13 +105,17 @@ def crud_delete_task(db: Session, task_id: int):
     return task
 
 
+def crud_get_tasks(db: Session):
+    tasks = db.query(Task).all()
+    return tasks
+
+
 # endregion TASKS
 
 
 # region AUTH
 async def crud_create_user(db: Session, user: AuthUserSchema):
     user.password = cipher_suite.encrypt(user.password.encode("utf-8")).decode()
-    print(f"user {user}")
     try:
         user_dict = OrderedDict(user)
 
@@ -132,7 +134,6 @@ async def crud_create_user(db: Session, user: AuthUserSchema):
 
 async def crud_login(db: Session, user: Login):
     email = user.email
-    # is_student = user.is_student
 
     user_record = db.query(AuthUser).filter(AuthUser.email == email).first()
 
@@ -150,8 +151,6 @@ async def crud_get_users(db: Session):
 
 
 async def crud_delete_user(db: Session, user_id: int):
-    print(f"user_id {user_id}")
-    logging.info(f"user_id {user_id}")
     user = db.query(AuthUser).filter(AuthUser.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -192,3 +191,28 @@ def crud_delete_activity(db: Session, activity_id: int):
 
 
 # endregion ACTIVITY
+
+
+# region GRADES
+def crud_create_grade(db: Session, grade_data: GradeCreateSchemas):
+    db_grade = Grade(**grade_data.dict())
+    db.add(db_grade)
+
+    task = db.query(Task).filter(Task.id == grade_data.task_id).first()
+    if task:
+        task.is_scored = True
+
+    db.commit()
+    db.refresh(db_grade)
+    return db_grade
+
+
+def crud_get_grades_by_task(db: Session, task_id: int):
+    return db.query(Grade).filter(Grade.task_id == task_id).all()
+
+
+def crud_get_grades_by_student(db: Session, student_id: int):
+    return db.query(Grade).filter(Grade.student_id == student_id).all()
+
+
+# region GRADES

@@ -1,19 +1,16 @@
-import * as React from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
     Button, DialogTitle, Dialog, Avatar, Checkbox,
     FormGroup, FormControlLabel, Box, Typography, ListItem
 } from '@mui/material';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
-
-// Lista de estudiantes ficticios (puedes venir de props o API)
-const studentsList = [
-    { id: 1, name: 'Janeiro Placido' },
-    { id: 2, name: 'Willy Q.V' },
-    { id: 3, name: 'Estudiante 3' },
-];
+import { SideBarContext } from '../context/SideBarContext';
 
 function SimpleDialog({ onClose, open, selectedStudents, setSelectedStudents }) {
+
+    const { students } = useContext(SideBarContext);
+
 
     const handleToggle = (id) => {
         setSelectedStudents((prev) =>
@@ -24,15 +21,16 @@ function SimpleDialog({ onClose, open, selectedStudents, setSelectedStudents }) 
     };
 
     const handleSelectAll = () => {
-        if (selectedStudents.length === studentsList.length) {
-            setSelectedStudents([]); // deselecciona todos
+        if (selectedStudents.length === students.length) {
+            setSelectedStudents([]);
         } else {
-            setSelectedStudents(studentsList.map((s) => s.id)); // selecciona todos
+            setSelectedStudents(students.map((s) => s.id));
         }
     };
 
+
     const handleClose = () => {
-        onClose(); // cerrar el diálogo
+        onClose();
     };
 
     return (
@@ -49,14 +47,14 @@ function SimpleDialog({ onClose, open, selectedStudents, setSelectedStudents }) 
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={selectedStudents.length === studentsList.length}
+                            checked={selectedStudents.length === students.length}
                             onChange={handleSelectAll}
                         />
                     }
                     label="Todos los estudiantes"
                 />
 
-                {studentsList.map((student) => (
+                {students.map((student) => (
                     <FormControlLabel
                         key={student.id}
                         control={
@@ -95,8 +93,9 @@ SimpleDialog.propTypes = {
 
 
 export default function SimpleDialogDemo() {
-    const [open, setOpen] = React.useState(false);
-    const [selectedStudents, setSelectedStudents] = React.useState([]);
+
+    const [open, setOpen] = useState(false);
+    const { selectedStudents, setSelectedStudents } = useContext(SideBarContext);
 
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
