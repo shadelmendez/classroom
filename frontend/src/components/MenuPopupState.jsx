@@ -1,6 +1,6 @@
 import {
     Button, Menu, MenuItem, Dialog, DialogTitle,
-    DialogActions, DialogContent, TextField, Divider
+    DialogActions, DialogContent, TextField, Divider, Box, Typography
 } from '@mui/material';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import {
@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { SideBarContext } from '../context/SideBarContext'
 import { getSubjects, createTheme } from '../api/api';
+import { AuthContext } from '../context/AuthContext';
 
 export default function MenuPopupState() {
     const {
@@ -19,6 +20,8 @@ export default function MenuPopupState() {
         classId,
         reloadThemes
     } = useContext(SideBarContext);
+
+    const { user } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
@@ -65,9 +68,16 @@ export default function MenuPopupState() {
             <PopupState variant="popover" popupId="menu-popup">
                 {(popupState) => (
                     <>
-                        <Button variant="contained" {...bindTrigger(popupState)} sx={{ borderRadius: 15, px: 3, py: 1.5 }}>
-                            <AddIcon /> Crear
-                        </Button>
+                        {!user?.is_student
+                            ? <Button variant="contained" {...bindTrigger(popupState)} sx={{ borderRadius: 15, px: 3, py: 1.5 }}>
+                                <AddIcon /> Crear
+                            </Button>
+                            : <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="button">Todos mis temas</Typography>
+                            </Box>
+                        }
+
+
                         <Menu {...bindMenu(popupState)}>
                             <MenuItem onClick={() => handleNavigation('task')}>
                                 <ArticleOutlined sx={{ mr: 1 }} /> Tarea

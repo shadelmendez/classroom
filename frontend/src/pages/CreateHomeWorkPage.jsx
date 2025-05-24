@@ -22,7 +22,7 @@ export default function CreateHomeWorkPage() {
         selectedTheme, setSelectedTheme,
         isQuestion,
         themesData, points, dueDate,
-        setThemeId, reloadThemes
+        setThemeId, reloadThemes, selectedStudents, fetchUnscoredTasks, isScored
     } = useContext(SideBarContext);
 
     const theme = useTheme();
@@ -46,9 +46,7 @@ export default function CreateHomeWorkPage() {
 
     const getThemeIdByTitle = (title) => {
         const theme = themesData.find(t => t.title === title);
-        console.log("theme ", theme, "title", title, "themesData", themesData)
         const themeId = theme?.id;
-        console.log("themeId ", themeId)
         setThemeId(themeId)
         return themeId
     };
@@ -65,20 +63,23 @@ export default function CreateHomeWorkPage() {
                 points: points,
                 due_date: dueDate?.format("YYYY-MM-DD") || null,
                 theme_id: getThemeIdByTitle(selectedTheme),
+                student_ids: selectedStudents,
                 options: isQuestion
                     ? options.map(opt => ({
                         text: opt.text,
                         identifier: opt.id,
                         is_correct: opt.id === selectedOption
                     }))
-                    : []
+                    : [],
+                is_scored: false
             };
-            console.log("taskPayload ", taskPayload)
-
             await createTask(taskPayload);
 
             // Recarga los temas actualizados
             await reloadThemes();
+            for (const id of selectedStudents) {
+                await fetchUnscoredTasks(id);
+            }
 
             // Reset form
             setTitle('');

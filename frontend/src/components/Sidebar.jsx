@@ -218,13 +218,14 @@ export default function Sidebar() {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/">
+            <ListItemButton component={RouterLink} to="/">
               <ListItemIcon>{iconMap["Home"]}</ListItemIcon>
               <ListItemText primary="Página principal" />
             </ListItemButton>
+
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/calendar">
+            <ListItemButton component={RouterLink} to="/calendar">
               <ListItemIcon>{iconMap["Calendar"]}</ListItemIcon>
               <ListItemText primary="Calendario" />
             </ListItemButton>
@@ -264,7 +265,7 @@ export default function Sidebar() {
         {/* Sección final */}
         <List>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/">
+            <ListItemButton component={RouterLink} to="/">
               <ListItemIcon>{iconMap["Settings"]}</ListItemIcon>
               <ListItemText primary="Configuración" />
             </ListItemButton>

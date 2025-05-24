@@ -4,16 +4,22 @@ import { SideBarContext } from '../context/SideBarContext';
 import ThemeItem from './ThemeItem';
 
 export default function ThemeList() {
-    const { themesData } = useContext(SideBarContext);
-    console.log("themesData.length ", themesData.length, "themesData ", themesData)
-    if (!Array.isArray(themesData) || themesData.length === 0) {
+    const { themesData, students } = useContext(SideBarContext);
+
+    const hasPendingTasks = themesData.some(theme => theme.tasks?.length > 0);
+
+    if (!hasPendingTasks) {
         return (
             <Box sx={{ mt: 4, textAlign: 'center' }}>
                 <Typography variant="h6" color="text.secondary">
-                    Todavía no se han creado temas para esta clase.
+                    Sin tareas pendientes para calificar.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    Usa el botón <strong>“Crear”</strong> para agregar un nuevo tema.
+                    Todo está al día 🎉
+                </Typography>
+
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Los temas aparecerán aquí una vez que se les asigne al menos una tarea.
                 </Typography>
             </Box>
         );

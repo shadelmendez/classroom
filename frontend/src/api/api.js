@@ -1,4 +1,3 @@
-// src/api.js
 import axios from "axios";
 
 const API = axios.create({
@@ -26,7 +25,6 @@ export const getSubjects = () => API.get("/subjects/");
 // ----------------------
 
 export const getThemesBySubject = (subjectId) => {
-  console.log("subjectId clic aca ", subjectId);
   return API.get(`/themes/subject/${subjectId}`);
 };
 
@@ -41,3 +39,11 @@ export const createTask = (data) => API.post("/tasks/", data);
 export const getTasksByTheme = (themeId) => API.get(`/tasks/theme/${themeId}`);
 
 export const deleteTask = (taskId) => API.delete(`/tasks/${taskId}`);
+
+export const getTasksByStudent = (studentId) =>
+  API.get(`/tasks/by-student/${studentId}`);
+
+export const saveGrade = (data) => API.post("/grades/", data);
+
+export const getUngradedTasksForStudent = (studentId) =>
+  API.get(`/tasks/student/${studentId}/pending`);

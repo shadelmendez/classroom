@@ -8,6 +8,9 @@ class OptionBaseSchemas(BaseModel):
     identifier: str
     is_correct: bool = False
 
+    class Config:
+        orm_mode = True
+
 
 class OptionCreateSchemas(OptionBaseSchemas):
     pass
@@ -24,15 +27,23 @@ class OptionSchemas(OptionBaseSchemas):
 class TaskBaseSchemas(BaseModel):
     title: str
     instructions: Optional[str]
-    type: str  # 'task' o 'question'
+    type: str
     date: str
     points: Optional[int]
     due_date: Optional[str]
+    is_scored: bool
+
+    class Config:
+        orm_mode = True
 
 
 class TaskCreateSchemas(TaskBaseSchemas):
     theme_id: int
     options: List[OptionCreateSchemas] = []
+    student_ids: List[int] = []
+
+    class Config:
+        orm_mode = True
 
 
 class TaskSchemas(TaskBaseSchemas):
@@ -48,9 +59,15 @@ class TaskSchemas(TaskBaseSchemas):
 class ThemeBaseSchemas(BaseModel):
     title: str
 
+    class Config:
+        orm_mode = True
+
 
 class ThemeCreateSchemas(ThemeBaseSchemas):
     subject_id: int
+
+    class Config:
+        orm_mode = True
 
 
 class ThemeSchemas(ThemeBaseSchemas):
@@ -75,6 +92,9 @@ class ActivityBaseSchemas(BaseModel):
     comment: str
     subject_id: int
 
+    class Config:
+        orm_mode = True
+
 
 class ActivityCreateSchemas(ActivityBaseSchemas):
     pass
@@ -93,6 +113,9 @@ class SubjectBaseSchemas(BaseModel):
     description: str
     icon_color: str
 
+    class Config:
+        orm_mode = True
+
 
 class SubjectCreateSchemas(SubjectBaseSchemas):
     pass
@@ -101,7 +124,7 @@ class SubjectCreateSchemas(SubjectBaseSchemas):
 class SubjectSchemas(SubjectBaseSchemas):
     id: int
     activities: List[ActivityInSubjectSchemas] = []
-    themes: List[ThemeSchemas] = []  # relación directa con temas
+    themes: List[ThemeSchemas] = []
 
     class Config:
         orm_mode = True
@@ -113,8 +136,31 @@ class AuthUserSchema(BaseModel):
     password: str
     is_student: bool
 
+    class Config:
+        orm_mode = True
+
 
 class Login(BaseModel):
     email: str
     password: str
     is_student: bool
+
+    class Config:
+        orm_mode = True
+
+
+# ---------- Grades ----------
+class GradeCreateSchemas(BaseModel):
+    task_id: int
+    student_id: int
+    score: int
+
+    class Config:
+        orm_mode = True
+
+
+class GradeSchemas(GradeCreateSchemas):
+    id: int
+
+    class Config:
+        orm_mode = True

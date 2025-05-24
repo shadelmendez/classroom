@@ -5,6 +5,7 @@ import {
 import { useContext } from 'react';
 import { SideBarContext } from '../context/SideBarContext';
 import { deleteTask } from '../api/api';
+import { AuthContext } from '../context/AuthContext';
 
 export default function TaskDetailsDialog() {
     const {
@@ -12,6 +13,8 @@ export default function TaskDetailsDialog() {
         setSelectedTask,
         reloadThemes
     } = useContext(SideBarContext);
+
+    const { user } = useContext(AuthContext);
 
     const handleClose = () => {
         setSelectedTask(null);
@@ -51,7 +54,8 @@ export default function TaskDetailsDialog() {
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleDelete} color="error">Eliminar</Button>
+                {!user?.is_student && <Button onClick={handleDelete} color="error">Eliminar</Button>}
+
                 <Button onClick={handleClose}>Cerrar</Button>
             </DialogActions>
         </Dialog>

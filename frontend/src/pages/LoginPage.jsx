@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = await login(form); // login desde AuthContext
+        const success = await login(form);
 
         if (success) {
             // fetch secciones para obtener el primer classId disponible
@@ -36,7 +36,7 @@ export default function LoginPage() {
             if (firstClassId) {
                 navigate(`/class/${firstClassId}/overview`);
             } else {
-                navigate("/"); // fallback
+                navigate("/");
             }
         } else {
             setError("Credenciales inválidas");
