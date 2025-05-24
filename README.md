@@ -39,3 +39,14 @@ npm run dev
 ```bash
 uvicorn main:app --reload
 ```
+
+### Pasos para probar el projecto
+
+1. Crear un usuario (ya sea profesor o estudiante)
+   Si el usuario es profesor:
+   - Crear una clase
+   - Crear tareas
+   - Calificar tareas
+     Si el usuario es estudiante:
+   - Ver mis clases
+   - Ver mis tareas

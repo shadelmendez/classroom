@@ -5,10 +5,13 @@ import {
     Box, Button, TextField, Typography, Paper, Checkbox, FormControlLabel
 } from "@mui/material";
 import { registerUser } from "../api/api";
+import { SideBarContext } from '../context/SideBarContext';
+
 
 
 export default function RegisterPage() {
     const { register } = useContext(AuthContext);
+    const { classId } = useContext(SideBarContext)
     const navigate = useNavigate();
     const [error, setError] = useState("");
     const [form, setForm] = useState({ email: "", password: "", is_student: false });
@@ -21,9 +24,10 @@ export default function RegisterPage() {
         e.preventDefault();
         try {
             const res = await registerUser(form);
-            register(res.data); // opcional: guardar en contexto
-            navigate(`/class/${firstClassId}/overview`);
+            register(res.data);
+            navigate(`/class/${classId}/overview`);
         } catch (err) {
+            console.log(err)
             setError("Error al registrar usuario");
         }
     };

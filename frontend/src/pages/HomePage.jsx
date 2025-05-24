@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import { useParams } from "react-router-dom";
+import HomeComponent from "../components/HomeComponent";
 
-function HomePage() {
-    return (
-        <div>HomePage</div>
-    )
+export default function HomePage() {
+
+  return (
+    <div>
+      <HomeComponent/>
+    </div>
+  );
 }
-
-export default HomePage

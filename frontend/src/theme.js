@@ -4,12 +4,11 @@ import "@fontsource/roboto";
 const theme = createTheme({
   palette: {
     primary: {
-      //botones
-      main: "#4E7CD9", // azul
-      light: "#EBF0FD", // hover
+      main: "#4E7CD9",
+      light: "#EBF0FD",
     },
     custom: {
-      grey: "#FAFAFA", // hover
+      grey: "#FAFAFA",
       icons: "#606368",
     },
     background: {

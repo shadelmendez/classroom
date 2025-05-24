@@ -1,11 +1,10 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { getSubjects } from "../api/api";
 import {
-    Box, Button, TextField, Typography, Paper, FormControlLabel, Checkbox
+    Box, Button, TextField, Typography, Paper,
 } from "@mui/material";
-import { loginUser } from "../api/api";
-import { getSidebarData } from "../api/sidebar";
 
 
 
@@ -26,18 +25,19 @@ export default function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = await login(form); // login desde AuthContext
+        const success = await login(form);
 
         if (success) {
             // fetch secciones para obtener el primer classId disponible
-            const sections = await getSidebarData();
-            const allItems = sections.flatMap((section) => section.items);
-            const firstClassId = allItems[0]?.to.replace("/", "");
+            const sections = await getSubjects();
+            // sections is already an array of subjects
+            const allItems = sections.data || sections; // handle both cases
+            const firstClassId = allItems[0]?.id?.toString().replace("/", "");
 
             if (firstClassId) {
                 navigate(`/class/${firstClassId}/overview`);
             } else {
-                navigate("/"); // fallback
+                navigate("/");
             }
         } else {
             setError("Credenciales inválidas");
@@ -69,21 +69,11 @@ export default function LoginPage() {
                         onChange={handleChange}
                         margin="normal"
                     />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={form.is_student}
-                                onChange={handleChange}
-                                name="is_student"
-                            />
-                        }
-                        label="Soy estudiante"
-                    />
                     <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                         Iniciar sesión
                     </Button>
                     <Button fullWidth sx={{ mt: 1 }} onClick={() => navigate("/register")}>
-                        ¿No tienes cuenta? Regístrate
+                        Registrarme
                     </Button>
                 </form>
             </Paper>

@@ -1,2 +1,1 @@
-from .subject import *
-from .activity import *
+from .crud import *
