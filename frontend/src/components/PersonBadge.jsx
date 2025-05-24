@@ -40,7 +40,7 @@ export default function PersonBadge({ person, selected, onSelect, type, options,
                 borderTop: showTopBorder ? "1px solid #e0e0e0" : "none"
             }}
         >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap:2 }}>
                 {isStudent && (
                     <Checkbox checked={selected} onChange={onSelect} />
                 )}

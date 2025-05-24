@@ -224,7 +224,7 @@ export default function Sidebar() {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/calendar">
+            <ListItemButton component={RouterLink} to="/calendar">
               <ListItemIcon>{iconMap["Calendar"]}</ListItemIcon>
               <ListItemText primary="Calendario" />
             </ListItemButton>

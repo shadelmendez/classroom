@@ -15,7 +15,7 @@ export default function PersonList({ data = [], type }) {
     const isStudent = type === "students";
     const allSelected = data.length > 0 && selected.length === data.length;
     const someSelected = selected.length > 0 && selected.length < data.length;
-    const studentOptions = ["Enviar correo a alumno", "Quitar", "Silenciar"];
+    const studentOptions = ["Enviar correo a alumno", "Quitar"];
     const teacherOptions = ["Enviar correo", "Quitar", "Hacer propietario de la clase"];
 
     const handleSelectAll = (event) => {
@@ -59,7 +59,8 @@ export default function PersonList({ data = [], type }) {
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                p: 2,
+                                p: 3.5,
+                                pt: 2
                             }}
                         >
                             <FormControlLabel

@@ -5,6 +5,7 @@ import OverviewPage from "./pages/OverviewPage";
 import ClassWorkPage from "./pages/ClassWorkPage";
 import PeoplePage from "./pages/PeoplePage";
 import HomePage from "./pages/HomePage";
+import CalendarPage from "./pages/CalendarPage";
 import CreateHomeWorkPage from "./pages/CreateHomeWorkPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -34,7 +35,7 @@ export default function App() {
               }
             >
               <Route index element={<HomePage />} />
-              <Route path="calendar" element={<div>Calendario</div>} />
+              <Route path="calendar" element={<CalendarPage />} />
               <Route
                 path="class/:classIdParam/*"
                 element={

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from database import Base
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean, UniqueConstraint
 from datetime import datetime
 
 
@@ -24,6 +24,8 @@ class Subject(Base):
     activities = relationship(
         "Activity", back_populates="subject", cascade="all, delete"
     )
+    members = relationship("ClassMembers", back_populates="subject", cascade="all, delete")
+
 
 
 class AuthUser(Base):
@@ -33,8 +35,21 @@ class AuthUser(Base):
     email = Column(String, index=True)
     password = Column(String)
     is_student = Column(Boolean, default=False)
+    class_memberships = relationship("ClassMembers", back_populates="user", cascade="all, delete")
 
+class ClassMembers(Base):
+    __tablename__ = "class_members"
 
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
+    role = Column(String, default="student", nullable=False)  # "teacher" o "student ( por ahora student >:) )"
+
+    user = relationship("AuthUser", back_populates="class_memberships")
+    subject = relationship("Subject", back_populates="members")
+    
+    __table_args__ = (UniqueConstraint("user_id", "subject_id", name="_user_subject_uc"),)
+    
 class Theme(Base):
     __tablename__ = "themes"
 
@@ -76,3 +91,5 @@ class Option(Base):
 
 # Actualiza el modelo Subject para que relacione con Theme
 Subject.themes = relationship("Theme", back_populates="subject", cascade="all, delete")
+
+

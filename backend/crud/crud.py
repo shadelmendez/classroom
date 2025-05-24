@@ -187,3 +187,17 @@ def crud_delete_activity(db: Session, activity_id: int):
 
 
 # endregion ACTIVITY
+
+# region CLASS_MEMBERS
+
+def add_user_to_class(db: Session, membership: ClassMemberCreateSchema):
+    db_membership = ClassMembers(**membership.dict())
+    db.add(db_membership)
+    db.commit()
+    db.refresh(db_membership)
+    return db_membership
+
+def get_class_members(db: Session, subject_id: int):
+    return db.query(ClassMembers).filter(ClassMembers.subject_id == subject_id).all()
+
+# endregion CLASS_MEMBERS

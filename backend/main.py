@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import Base, engine
-from routers import subject, activity, auth, tasks, themes
+from routers import subject, activity, auth, tasks, themes, classmembers
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="School API")
@@ -25,3 +25,4 @@ app.include_router(activity.router)
 app.include_router(auth.router)
 app.include_router(tasks.router)
 app.include_router(themes.router)
+app.include_router(classmembers.router)

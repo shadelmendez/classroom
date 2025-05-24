@@ -23,3 +23,8 @@ def delete_task(task_id: int, db: Session = Depends(database.get_db)):
     if not deleted:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return {"message": "Tarea eliminada correctamente"}
+
+@router.get("/calendar", response_model=list[TaskForCalendar])
+def get_tasks_for_calendar(db: Session = Depends(database.get_db)):
+    tasks = db.query(Task.title, Task.due_date).all()
+    return [TaskForCalendar(title=t[0], due_date=t[1]) for t in tasks]

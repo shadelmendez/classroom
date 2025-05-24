@@ -44,6 +44,13 @@ class TaskSchemas(TaskBaseSchemas):
         orm_mode = True
 
 
+class TaskForCalendar(BaseModel):
+    title: str
+    due_date: str
+
+    class Config:
+        orm_mode = True
+
 # ---------- Temas ----------
 class ThemeBaseSchemas(BaseModel):
     title: str
@@ -118,3 +125,19 @@ class Login(BaseModel):
     email: str
     password: str
     is_student: bool
+
+
+# ---------- Miembros de la clase ----------
+class ClassMemberBaseSchema(BaseModel):
+    role: str  # "teacher" or "student"
+
+class ClassMemberCreateSchema(ClassMemberBaseSchema):
+    user_id: int
+    subject_id: int
+
+class ClassMemberReadSchema(ClassMemberBaseSchema):
+    id: int
+    user_id: int
+    subject_id: int
+    class Config:
+        orm_mode = True
