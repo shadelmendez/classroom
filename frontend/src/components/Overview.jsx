@@ -1,52 +1,101 @@
-import { getOverviewData } from "../api/overview"; 
 import React, { useEffect, useState, useContext } from "react";
 import { Box, Typography, Card, Grid, TextField, Button, useTheme } from "@mui/material";
-import { getSidebarData } from "../api/sidebar";
 import { SideBarContext } from "../context/SideBarContext";
+import { AuthContext } from "../context/AuthContext";
+import { getSubjectByName, getActivitiesBySubject, getUsers, createActivities } from "../api/api";
 
 const Overview = () => {
   const theme = useTheme();
   const { classId } = useContext(SideBarContext);
+  const { user } = useContext(AuthContext);
 
   const [courseLabel, setCourseLabel] = useState("");
+  const [courseSection, setCourseSection] = useState(""); // NEW
   const [tasks, setTasks] = useState([]);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [users, setUsers] = useState({});
+
+  // Fetch all users once
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await getUsers();
+      const usersById = {};
+      res.data.forEach(u => {
+        usersById[u.id] = u;
+      });
+      setUsers(usersById);
+    };
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
-    const fetchCourseLabel = async () => {
-      const sections = await getSidebarData();
-      const allItems = sections.flatMap(section => section.items);
-      const found = allItems.find(item => item.to.replace("/", "") === classId);
-      setCourseLabel(found ? found.label : "");
-    };
-
     const fetchOverviewData = async () => {
-      const data = await getOverviewData();
-      setTasks(data.tasks || []);
-      setComments(data.comments || []);
+      if (!classId) return;
+      // First, get the subject by name to obtain its id
+      const subjectRes = await getSubjectByName(classId);
+      const subject = subjectRes.data;
+      setCourseLabel(subject?.name || "");
+      setCourseSection(subject?.section || ""); // NEW
+
+      if (subject?.id) {
+        const response = await getActivitiesBySubject(subject.id);
+        const activities = response.data;
+        const comments = Array.isArray(activities)
+          ? activities.filter(item => item.comment)
+          : [];
+        setComments(comments);
+        // setTasks(...) if needed
+      } else {
+        setTasks([]);
+        setComments([]);
+      }
     };
 
-    fetchCourseLabel();
     fetchOverviewData();
   }, [classId]);
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+    if (!user?.id || !classId) return;
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      setComments([
-        ...comments,
-        { user: "Tú", date: "Ahora", text: newComment.trim() },
-      ]);
+    // Get subject info to get subject_id
+    const subjectRes = await getSubjectByName(classId);
+    const subject = subjectRes.data;
+
+    if (!subject?.id) return;
+
+    // Prepare activity data
+    const activityData = {
+      comment: newComment.trim(),
+      subject_id: subject.id,
+      user_id: user.id,
+    };
+
+    try {
+      // Post the new comment/activity
+      await createActivities(activityData);
+
+      // Optionally, refresh comments from backend
+      const response = await getActivitiesBySubject(subject.id);
+      const activities = response.data;
+      const comments = Array.isArray(activities)
+        ? activities.filter(item => item.comment)
+        : [];
+      setComments(comments);
+
       setNewComment("");
+    } catch (err) {
+      // Optionally handle error
+      console.error("Error al crear el comentario:", err);
     }
   };
 
   return (
-    <Box sx={{ 
-      padding: 3, 
-      backgroundColor: theme.palette.background.default, 
-      color: theme.palette.text.primary, 
-      minHeight: "100vh" 
+    <Box sx={{
+      padding: 3,
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.text.primary,
+      minHeight: "100vh"
     }}>
       {/* Header Section estilo Google Classroom */}
       <Box
@@ -77,15 +126,14 @@ const Overview = () => {
             {courseLabel}
           </Typography>
           <Typography
-            variant="subtitle1"
+            variant="body2"
             sx={{
-              color: "#fff",
-              opacity: 0.85,
-              fontSize: 22,
+              color: "#e0e0e0",
               fontWeight: 400,
+              letterSpacing: 1,
             }}
           >
-            01
+            {courseSection || "—"}
           </Typography>
         </Box>
         <Box
@@ -111,7 +159,7 @@ const Overview = () => {
               sx={{
                 backgroundColor: theme.palette.background.paper,
                 color: theme.palette.text.primary,
-                border: `1px solid ${theme.palette.divider}`,
+                border: `10px solid ${theme.palette.divider}`,
                 borderRadius: 2,
                 padding: 2,
                 display: "flex",
@@ -187,16 +235,16 @@ const Overview = () => {
                 fontSize: 20,
               }}
             >
-              {comment.user.charAt(0)}
+              {(users[comment.user_id]?.email ? users[comment.user_id].email.charAt(0).toUpperCase() : "A")}
             </Box>
             <Box>
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                {comment.user}
+                {users[comment.user_id]?.email || "Anónimo"}
               </Typography>
               <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                {comment.date}
+                {comment.date || ""}
               </Typography>
-              <Typography variant="body2">{comment.text}</Typography>
+              <Typography variant="body2">{comment.text || comment.comment}</Typography>
             </Box>
           </Box>
         ))}

@@ -91,6 +91,7 @@ class ActivityInSubjectSchemas(BaseModel):
 class ActivityBaseSchemas(BaseModel):
     comment: str
     subject_id: int
+    user_id: int
 
     class Config:
         orm_mode = True
@@ -112,6 +113,8 @@ class SubjectBaseSchemas(BaseModel):
     name: str
     description: str
     icon_color: str
+    section: str
+    educator_id: int
 
     class Config:
         orm_mode = True

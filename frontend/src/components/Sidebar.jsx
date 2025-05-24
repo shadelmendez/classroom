@@ -8,7 +8,6 @@ import {
   List,
   Typography,
   Divider,
-  IconButton,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -20,63 +19,39 @@ import {
   Link
 } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import HomeIcon from "@mui/icons-material/Home";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SettingsIcon from "@mui/icons-material/Settings";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import GroupIcon from '@mui/icons-material/Group';
 import SchoolIcon from '@mui/icons-material/School';
 import logo from "../assets/logo.svg"
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { SideBarContext } from "../context/SideBarContext";
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import AddToDriveOutlinedIcon from '@mui/icons-material/AddToDriveOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { AuthContext } from "../context/AuthContext";
-import { getSubjects } from "../api/api";
+import { getSubjects, getEnrolledSubjects, getTeachedSubjects } from "../api/api";
 
-
-// #region configuracion de material ui para el componente
 const drawerWidth = 240;
 
-const Main = styled("main", {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
+const Main = styled("main")(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
+  marginLeft: `${drawerWidth}px`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
 }));
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
+const AppBar = styled(MuiAppBar)(({ theme }) => ({
+  width: `calc(100% - ${drawerWidth}px)`,
+  marginLeft: drawerWidth,
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
   }),
 }));
 
@@ -87,28 +62,22 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: "flex-end",
 }));
-// #endregion
 
-// Iconos disponibles
 const iconMap = {
   Home: <HomeIcon />,
   Calendar: <CalendarTodayIcon />,
   Settings: <SettingsIcon />,
-  Inbox: <InboxIcon />,
-  Mail: <MailIcon />,
   Group: <GroupIcon sx={{ mr: 1 }} />,
   Class: <SchoolIcon sx={{ mr: 1 }} />
 };
 
-
 export default function Sidebar() {
   const theme = useTheme();
 
-  const { open, setOpen, setClassId, classId } = useContext(SideBarContext)
+  const { setClassId, classId } = useContext(SideBarContext);
 
   const [sections, setSections] = useState([]);
   const { user } = useContext(AuthContext);
-
 
   useEffect(() => {
     const loadSubjects = async () => {
@@ -116,13 +85,41 @@ export default function Sidebar() {
         const res = await getSubjects();
         const subjects = res.data;
 
+        let teachedSubjects = [];
+        try {
+          const teachedRes = await getTeachedSubjects(user.id);
+          console.log("teach", teachedRes);
+          teachedSubjects = teachedRes.data;
+          console.log("teach", teachedRes);
+        } catch (e) {
+          teachedSubjects = [];
+          console.log("picis");
+        }
+
+        let enrolledSubjects = [];
+        try {
+          const enrolledRes = await getEnrolledSubjects(user.id);
+          enrolledSubjects = enrolledRes.data;
+        } catch (e) {
+          enrolledSubjects = [];
+        }
+
         const dynamicSections = [
           {
             title: "Cursos que dictas",
-            items: subjects.map((subject) => ({
-              to: subject.name, // este será usado en las rutas como classId
+            items: teachedSubjects.map((subject) => ({
+              to: subject.name,
               label: subject.name,
-              iconColor: subject.icon_color || "#1976d2"
+              iconColor: subject.icon_color || "#1976d2",
+              section: subject.section, // <-- add this
+            })),
+          },
+          {
+            title: "Cursos inscritos",
+            items: enrolledSubjects.map((subject) => ({
+              to: subject.name,
+              label: subject.name,
+              iconColor: subject.icon_color || "#388e3c"
             })),
           },
         ];
@@ -136,10 +133,6 @@ export default function Sidebar() {
     loadSubjects();
   }, []);
 
-
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -149,40 +142,28 @@ export default function Sidebar() {
   const currentTab = tabRoutes.findIndex((route) =>
     location.pathname.includes(route)
   );
-  const tabValue = currentTab === -1 ? 0 : currentTab; // Valor válido siempre
-
+  const tabValue = currentTab === -1 ? 0 : currentTab;
 
   const handleTabChanged = (event, newValue) => {
     navigate(`/class/${classId}/${tabRoutes[newValue]}`);
   };
+
+  const isHome = location.pathname === "/home" || location.pathname === "/";
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
       {/* Topbar */}
-      <AppBar position="fixed" open={open} color="primary">
+      <AppBar position="fixed" color="primary">
         <Toolbar sx={{ backgroundColor: theme.palette.background.default, gap: "1rem" }}>
-          <IconButton
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              color: theme.palette.custom.icons,
-              mr: 2,
-              ...(open && { display: "none" }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
             <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
               <img src={logo} alt="Logo" style={{ height: 40 }} />
               <Typography variant="h5" noWrap color={theme.palette.text.primary}>
                 Classroom
               </Typography>
-              <ChevronRightIcon sx={{ color: theme.palette.custom.icons }} />
+              <GroupIcon sx={{ color: theme.palette.custom.icons, ml: 1, mr: 1 }} />
               <Link href="#" underline="hover" sx={{ color: theme.palette.text.primary }}>
                 <Typography variant="body2" fontWeight="600">{classId}</Typography>
                 <Typography variant="caption">01</Typography>
@@ -193,7 +174,7 @@ export default function Sidebar() {
         </Toolbar>
       </AppBar>
 
-      {/* Sidebar */}
+      {/* Sidebar permanente */}
       <Drawer
         sx={{
           width: drawerWidth,
@@ -204,17 +185,11 @@ export default function Sidebar() {
             backgroundColor: theme.palette.background.default,
           },
         }}
-        variant="persistent"
+        variant="permanent"
         anchor="left"
-        open={open}
+        open
       >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose} sx={{ color: theme.palette.custom.icons }}>
-            {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
-
-        {/* Secciones estáticas */}
+        <DrawerHeader />
         <Divider />
         <List>
           <ListItem disablePadding>
@@ -229,7 +204,6 @@ export default function Sidebar() {
               <ListItemIcon>{iconMap["Calendar"]}</ListItemIcon>
               <ListItemText primary="Calendario" />
             </ListItemButton>
-
           </ListItem>
         </List>
         <Divider />
@@ -253,7 +227,10 @@ export default function Sidebar() {
                     <ListItemIcon sx={{ color: item.iconColor || theme.palette.custom.icons }}>
                       {<Avatar sx={{ width: 28, height: 28, backgroundColor: item.iconColor }}>{item.label[0]}</Avatar>}
                     </ListItemIcon>
-                    <ListItemText secondary={item.label} />
+                    <ListItemText
+                      primary={item.label}
+                      secondary={item.section}
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -262,7 +239,6 @@ export default function Sidebar() {
           </Box>
         ))}
 
-        {/* Sección final */}
         <List>
           <ListItem disablePadding>
             <ListItemButton component={RouterLink} to="/">
@@ -274,21 +250,25 @@ export default function Sidebar() {
       </Drawer>
 
       {/* Contenido principal */}
-      <Main open={open}>
+      <Main>
         <DrawerHeader />
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
-          <Tabs value={tabValue} onChange={handleTabChanged}>
-            <Tab label="Novedades" />
-            <Tab label="Trabajo en clase" />
-            <Tab label="Personas" />
-            {!user?.is_student && <Tab label="Calificaciones" />}
-          </Tabs>
-
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
-            <CalendarTodayOutlinedIcon fontSize="small" />
-            <AddToDriveOutlinedIcon fontSize="small" />
-            <SettingsOutlinedIcon fontSize="small" />
+        {!isHome && (
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Tabs value={tabValue} onChange={handleTabChanged}>
+              <Tab label="Novedades" />
+              <Tab label="Trabajo en clase" />
+              <Tab label="Personas" />
+              {!user?.is_student && <Tab label="Calificaciones" />}
+            </Tabs>
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
+              <CalendarTodayOutlinedIcon fontSize="small" />
+              <AddToDriveOutlinedIcon fontSize="small" />
+              <SettingsOutlinedIcon fontSize="small" />
+            </Box>
           </Box>
+        )}
+        <Box sx={{ pt: isHome ? 0 : 3 }}>
+          <Outlet />
         </Box>
       </Main>
     </Box>

@@ -29,6 +29,14 @@ def read_activity(activity_id: int, db: Session = Depends(database.get_db)):
     return db_activity
 
 
+@router.get("/read-by-subject-id/{subject_id}", response_model=list[ActivitySchemas])
+def read_activity_by_subject_id(subject_id: int, db: Session = Depends(database.get_db)):
+    db_activities = crud_get_activity_by_subject_id(db, subject_id)
+    if not db_activities:
+        raise HTTPException(status_code=404, detail="No activities found for the given subject ID")
+    return db_activities
+
+
 @router.delete("/{activity_id}")
 def delete_activity(activity_id: int, db: Session = Depends(database.get_db)):
     return crud_delete_activity(db, activity_id)
